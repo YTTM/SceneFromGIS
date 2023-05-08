@@ -2,7 +2,7 @@ import numpy as np
 import rasterio
 
 
-def read(filename, crs='EPSG:2154'):
+def read(filename, crs):
     elevation_gis = rasterio.open(filename)
     elevation_arr = elevation_gis.read()[0]
 
