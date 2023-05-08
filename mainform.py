@@ -37,7 +37,7 @@ class Ui_MainWindow(object):
         self.pushButton_exp.setObjectName("pushButton_exp")
         self.gridLayout_right.addWidget(self.pushButton_exp, 4, 0, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_right, 0, 2, 2, 1)
-        self.graphicsView_2d = QtWidgets.QGraphicsView(self.centralwidget)
+        self.graphicsView_2d = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(2)

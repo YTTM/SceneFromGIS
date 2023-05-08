@@ -1,12 +1,16 @@
 import os
 
+import numpy as np
+
+import scene
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidgetItem
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 import mainform
 import importform
-
-import scene
 
 
 class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
@@ -38,6 +42,18 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         if dlg.exec():
             self.add_layer(dlg.result['filename'], dlg.result['type'])
 
+    def update_view_2d(self, view):
+        view = np.stack((view,) * 3, axis=-1)
+
+        height, width, channel = view.shape
+        bytesPerLine = 3 * width
+        qImg = QImage(view.tobytes(), width, height, bytesPerLine, QImage.Format_RGB888)  # .rgbSwapped()
+        pixmap = QPixmap.fromImage(qImg)
+        pixmap = pixmap.scaled(self.graphicsView_2d.geometry().width() - 25,
+                               self.graphicsView_2d.geometry().height() - 25,
+                               QtCore.Qt.KeepAspectRatio)
+        self.graphicsView_2d.setPixmap(pixmap)
+
     def event_pushbutton_remove_layer_clicked(self):
         print("event_pushButton_remove_layer_clicked")
         self.remove_layer(self.listWidget_input.currentRow())
@@ -55,6 +71,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
         self.statusbar.showMessage(self.current_scene.layers[i][0])
         self.comboBox_1.setCurrentIndex(self.current_scene.layers[i][1])
+        self.update_view_2d(self.current_scene.layers[i][3])
 
     def event_comboBox_1_activated(self, j):
         print("event_comboBox_1_currentindexchanged", j)
