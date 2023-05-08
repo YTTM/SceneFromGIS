@@ -43,6 +43,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(2)
         sizePolicy.setHeightForWidth(self.graphicsView_2d.sizePolicy().hasHeightForWidth())
         self.graphicsView_2d.setSizePolicy(sizePolicy)
+        self.graphicsView_2d.setAlignment(QtCore.Qt.AlignCenter)
         self.graphicsView_2d.setObjectName("graphicsView_2d")
         self.gridLayout.addWidget(self.graphicsView_2d, 0, 1, 1, 1)
         self.view_3d = QtWidgets.QFrame(self.centralwidget)

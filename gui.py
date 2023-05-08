@@ -43,8 +43,11 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             self.add_layer(dlg.result['filename'], dlg.result['type'])
 
     def update_view_2d(self, view):
-        view = np.stack((view,) * 3, axis=-1)
+        if view is None:
+            self.graphicsView_2d.clear()
+            return
 
+        view = np.stack((view,) * 3, axis=-1)
         height, width, channel = view.shape
         bytesPerLine = 3 * width
         qImg = QImage(view.tobytes(), width, height, bytesPerLine, QImage.Format_RGB888)  # .rgbSwapped()
