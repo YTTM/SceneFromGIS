@@ -1,5 +1,7 @@
+import os
+
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
 import mainform
 import importform
@@ -32,7 +34,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
-        self.scene = Scene()
+        self.setAcceptDrops(True)
 
     def add_layer_dialog(self, filename):
         dlg = DialogImport()
@@ -64,6 +66,22 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_action_add(self):
         print("event_action_add")
         self.add_layer_dialog("")
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        for f in files:
+            if os.path.isfile(f):
+                self.add_layer_dialog(f)
+            else:
+                QMessageBox.critical(self,
+                                     "Not a file",
+                                     f"{f} is not a valid file")
 
 
 def start(argv):
