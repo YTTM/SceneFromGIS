@@ -5,7 +5,7 @@ layer_types = ['heightmap', 'path (line)',
                'forest (line)', 'forest (polygon)',
                'forest (point)', 'water (line)',
                'water (polygon)']
-layer_symbol = ['🏞️', '🛣️', '🏠', '🧱', '🌳', '🌳', '🌳', '🌊', '🌊']
+layer_symbol = ['🏞️', '🛣️', '🏠', '🧱', '🌿', '🌳', '🌲', '💧', '🌊']
 
 
 class Scene:
