@@ -1,18 +1,108 @@
 import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidgetItem
 
 import mainform
 import importform
 
-from scene import Scene
+import scene
+
+
+class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
+    def __init__(self, *args, **kwargs):
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+        for l in range(len(scene.layer_types)):
+            self.comboBox_1.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
+        self.setAcceptDrops(True)
+
+        self.current_scene = scene.Scene()
+
+    def add_layer(self, filename, type):
+        self.current_scene.add_layer(filename, type)
+
+        item = QListWidgetItem(f'{scene.layer_symbol[type]} {os.path.basename(filename)}', self.listWidget_input)
+        self.listWidget_input.addItem(item)
+
+    def remove_layer(self, i):
+        if i < 0:
+            return
+
+        self.listWidget_input.takeItem(i)
+        self.current_scene.remove_layer(i)
+
+    def add_layer_dialog(self, filename):
+        dlg = DialogImport()
+        dlg.set_file_path(filename)
+        if dlg.exec():
+            self.add_layer(dlg.result['filename'], dlg.result['type'])
+
+    def event_pushbutton_remove_layer_clicked(self):
+        print("event_pushButton_remove_layer_clicked")
+        self.remove_layer(self.listWidget_input.currentRow())
+
+    def event_pushbutton_gen_clicked(self):
+        print("event_pushButton_gen_clicked")
+
+    def event_pushbutton_exp_clicked(self):
+        print("event_pushButton_exp_clicked")
+
+    def event_listwidget_input_currentrowchanged(self, i):
+        # print("event_listwidget_input_currentRowChanged", i)
+        if i < 0:
+            return
+
+        self.statusbar.showMessage(self.current_scene.layers[i][0])
+        self.comboBox_1.setCurrentIndex(self.current_scene.layers[i][1])
+
+    def event_comboBox_1_activated(self, j):
+        print("event_comboBox_1_currentindexchanged", j)
+        i = self.listWidget_input.currentRow()
+        if i < 0:
+            return
+        self.current_scene.layers[i][1] = j
+        item = self.listWidget_input.item(i)
+        item.setText(f'{scene.layer_symbol[self.current_scene.layers[i][1]]} '
+                     f'{os.path.basename(self.current_scene.layers[i][0])}')
+
+    def event_action_new(self):
+        print("event_action_new")
+
+    def event_action_open(self):
+        print("event_action_open")
+
+    def event_action_save(self):
+        print("event_action_save")
+
+    def event_action_add(self):
+        print("event_action_add")
+        self.add_layer_dialog("")
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        for f in files:
+            if os.path.isfile(f):
+                self.add_layer_dialog(f)
+            else:
+                QMessageBox.critical(self,
+                                     "Not a file",
+                                     f"{f} is not a valid file")
 
 
 class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
     def __init__(self):
         super(DialogImport, self).__init__()
         self.setupUi(self)
+        for l in range(len(scene.layer_types)):
+            self.comboBox_layer_type.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
+
         self.result = {'filename': None,
                        'type': None}
 
@@ -70,60 +160,6 @@ class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
         self.result['filename'] = self.lineEdit_file_path.text()
         self.result['type'] = self.comboBox_layer_type.currentIndex()
         super(DialogImport, self).accept()
-
-
-class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
-    def __init__(self, *args, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
-        self.setupUi(self)
-        self.setAcceptDrops(True)
-
-    def add_layer_dialog(self, filename):
-        dlg = DialogImport()
-        dlg.set_file_path(filename)
-        if dlg.exec():
-            print(dlg.result)
-
-    def event_pushbutton_remove_layer_clicked(self):
-        print("event_pushButton_remove_layer_clicked")
-
-    def event_pushbutton_gen_clicked(self):
-        print("event_pushButton_gen_clicked")
-
-    def event_pushbutton_exp_clicked(self):
-        print("event_pushButton_exp_clicked")
-
-    def event_listwidget_input_currentRowChanged(self, i):
-        print(i)
-
-    def event_action_new(self):
-        print("event_action_new")
-
-    def event_action_open(self):
-        print("event_action_open")
-
-    def event_action_save(self):
-        print("event_action_save")
-
-    def event_action_add(self):
-        print("event_action_add")
-        self.add_layer_dialog("")
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
-        else:
-            event.ignore()
-
-    def dropEvent(self, event):
-        files = [u.toLocalFile() for u in event.mimeData().urls()]
-        for f in files:
-            if os.path.isfile(f):
-                self.add_layer_dialog(f)
-            else:
-                QMessageBox.critical(self,
-                                     "Not a file",
-                                     f"{f} is not a valid file")
 
 
 def start(argv):
