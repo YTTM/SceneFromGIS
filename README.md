@@ -1,4 +1,5 @@
-# SceneFromGIS
+# SceneFromGIS <img src="SfGicon.png" height="32">
+
 Create scenes for video game maps from real geographic data
 
 
