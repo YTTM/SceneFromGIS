@@ -17,6 +17,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
         for l in range(len(scene.layer_types)):
             self.comboBox_1.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
         self.setAcceptDrops(True)
@@ -24,7 +25,11 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.current_scene = scene.Scene()
 
     def add_layer(self, filename, type):
-        self.current_scene.add_layer(filename, type)
+        self.lineEdit_crs.setEnabled(False)
+        r = self.current_scene.add_layer(filename, type)
+
+        if type == 0:
+            self.lineEdit_area.setText(str(r))
 
         item = QListWidgetItem(f'{scene.layer_symbol[type]} {os.path.basename(filename)}', self.listWidget_input)
         self.listWidget_input.addItem(item)
@@ -63,9 +68,11 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
     def event_pushbutton_gen_clicked(self):
         print("event_pushButton_gen_clicked")
+        # todo: generate output
 
     def event_pushbutton_exp_clicked(self):
         print("event_pushButton_exp_clicked")
+        # todo: export output
 
     def event_listwidget_input_currentrowchanged(self, i):
         # print("event_listwidget_input_currentRowChanged", i)
@@ -76,8 +83,16 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.comboBox_1.setCurrentIndex(self.current_scene.layers[i][1])
         self.update_view_2d(self.current_scene.layers[i][3])
 
+    def event_listwidget_input_doubleclicked(self, modelindex):
+        print("event_listwidget_input_doubleclicked")
+        # todo: update area
+
+    def event_lineedit_crs_textchanged(self, crs):
+        # print("event_lineedit_crs_textchanged")
+        self.current_scene.crs = str(crs)
+
     def event_comboBox_1_activated(self, j):
-        print("event_comboBox_1_currentindexchanged", j)
+        # print("event_comboBox_1_currentindexchanged", j)
         i = self.listWidget_input.currentRow()
         if i < 0:
             return
@@ -87,16 +102,19 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                      f'{os.path.basename(self.current_scene.layers[i][0])}')
 
     def event_action_new(self):
+        # todo: new project
         print("event_action_new")
 
     def event_action_open(self):
+        # todo: load project (json)
         print("event_action_open")
 
     def event_action_save(self):
+        # todo: save project (json)
         print("event_action_save")
 
     def event_action_add(self):
-        print("event_action_add")
+        # print("event_action_add")
         self.add_layer_dialog("")
 
     def dragEnterEvent(self, event):
@@ -120,6 +138,7 @@ class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
     def __init__(self):
         super(DialogImport, self).__init__()
         self.setupUi(self)
+        self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
         for l in range(len(scene.layer_types)):
             self.comboBox_layer_type.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
 

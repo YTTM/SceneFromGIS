@@ -87,17 +87,17 @@
     </item>
     <item row="0" column="0" rowspan="2">
      <layout class="QGridLayout" name="gridLayout_left">
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QPushButton" name="pushButton_remove_layer">
         <property name="text">
          <string>Remove layer</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QListWidget" name="listWidget_input"/>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <layout class="QGridLayout" name="gridLayout_properties">
         <item row="0" column="1">
          <widget class="QComboBox" name="comboBox_1"/>
@@ -164,6 +164,34 @@
            <number>100</number>
           </property>
          </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_project_setup">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_crs">
+          <property name="text">
+           <string>CRS</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEdit_crs">
+          <property name="text">
+           <string>EPSG:2154</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Area</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="lineEdit_area"/>
         </item>
        </layout>
       </item>
@@ -380,6 +408,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>listWidget_input</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_crs</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_lineedit_crs_textchanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>37</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>event_pushbutton_remove_layer_clicked()</slot>
@@ -391,5 +451,7 @@
   <slot>event_action_save()</slot>
   <slot>event_action_add()</slot>
   <slot>event_comboBox_1_activated(int)</slot>
+  <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
+  <slot>event_lineedit_crs_textchanged(QString)</slot>
  </slots>
 </ui>
