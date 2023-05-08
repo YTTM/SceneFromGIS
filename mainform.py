@@ -33,9 +33,9 @@ class Ui_MainWindow(object):
         self.pushButton_gen = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_gen.setObjectName("pushButton_gen")
         self.gridLayout_right.addWidget(self.pushButton_gen, 3, 0, 1, 1)
-        self.pushButton_gen_exp = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_gen_exp.setObjectName("pushButton_gen_exp")
-        self.gridLayout_right.addWidget(self.pushButton_gen_exp, 4, 0, 1, 1)
+        self.pushButton_exp = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_exp.setObjectName("pushButton_exp")
+        self.gridLayout_right.addWidget(self.pushButton_exp, 4, 0, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_right, 0, 2, 2, 1)
         self.graphicsView_2d = QtWidgets.QGraphicsView(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.view_3d = QtWidgets.QFrame(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(2)
-        sizePolicy.setVerticalStretch(2)
+        sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.view_3d.sizePolicy().hasHeightForWidth())
         self.view_3d.setSizePolicy(sizePolicy)
         self.view_3d.setFrameShape(QtWidgets.QFrame.StyledPanel)
@@ -137,7 +137,27 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuLayer.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.pushButton_remove_layer.clicked.connect(MainWindow.event_pushbutton_remove_layer_clicked) # type: ignore
+        self.pushButton_gen.clicked.connect(MainWindow.event_pushbutton_gen_clicked) # type: ignore
+        self.pushButton_exp.clicked.connect(MainWindow.event_pushbutton_exp_clicked) # type: ignore
+        self.listWidget_input.currentRowChanged['int'].connect(MainWindow.event_listwidget_input_currentRowChanged) # type: ignore
+        self.actionNew.triggered.connect(MainWindow.event_action_new) # type: ignore
+        self.actionOpen.triggered.connect(MainWindow.event_action_open) # type: ignore
+        self.actionSave.triggered.connect(MainWindow.event_action_save) # type: ignore
+        self.actionAdd.triggered.connect(MainWindow.event_action_add) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.listWidget_input, self.pushButton_remove_layer)
+        MainWindow.setTabOrder(self.pushButton_remove_layer, self.comboBox_1)
+        MainWindow.setTabOrder(self.comboBox_1, self.spinBox_uint_2)
+        MainWindow.setTabOrder(self.spinBox_uint_2, self.spinBox_ushort_3)
+        MainWindow.setTabOrder(self.spinBox_ushort_3, self.spinBox_ushort_4)
+        MainWindow.setTabOrder(self.spinBox_ushort_4, self.spinBox_ushort_5)
+        MainWindow.setTabOrder(self.spinBox_ushort_5, self.graphicsView_2d)
+        MainWindow.setTabOrder(self.graphicsView_2d, self.listView_output)
+        MainWindow.setTabOrder(self.listView_output, self.checkBox_gen_2d)
+        MainWindow.setTabOrder(self.checkBox_gen_2d, self.checkBox_gen_3d)
+        MainWindow.setTabOrder(self.checkBox_gen_3d, self.pushButton_gen)
+        MainWindow.setTabOrder(self.pushButton_gen, self.pushButton_exp)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -145,7 +165,7 @@ class Ui_MainWindow(object):
         self.checkBox_gen_2d.setText(_translate("MainWindow", "Generate 2D maps"))
         self.checkBox_gen_3d.setText(_translate("MainWindow", "Generate 3D obj"))
         self.pushButton_gen.setText(_translate("MainWindow", "Generate"))
-        self.pushButton_gen_exp.setText(_translate("MainWindow", "Generate and Export"))
+        self.pushButton_exp.setText(_translate("MainWindow", "Export"))
         self.pushButton_remove_layer.setText(_translate("MainWindow", "Remove layer"))
         self.comboBox_1.setItemText(0, _translate("MainWindow", "path (line)"))
         self.comboBox_1.setItemText(1, _translate("MainWindow", "building (line)"))

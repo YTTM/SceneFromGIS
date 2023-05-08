@@ -42,9 +42,9 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QPushButton" name="pushButton_gen_exp">
+       <widget class="QPushButton" name="pushButton_exp">
         <property name="text">
-         <string>Generate and Export</string>
+         <string>Export</string>
         </property>
        </widget>
       </item>
@@ -65,7 +65,7 @@
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
+        <verstretch>1</verstretch>
        </sizepolicy>
       </property>
       <property name="frameShape">
@@ -251,6 +251,160 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>listWidget_input</tabstop>
+  <tabstop>pushButton_remove_layer</tabstop>
+  <tabstop>comboBox_1</tabstop>
+  <tabstop>spinBox_uint_2</tabstop>
+  <tabstop>spinBox_ushort_3</tabstop>
+  <tabstop>spinBox_ushort_4</tabstop>
+  <tabstop>spinBox_ushort_5</tabstop>
+  <tabstop>graphicsView_2d</tabstop>
+  <tabstop>listView_output</tabstop>
+  <tabstop>checkBox_gen_2d</tabstop>
+  <tabstop>checkBox_gen_3d</tabstop>
+  <tabstop>pushButton_gen</tabstop>
+  <tabstop>pushButton_exp</tabstop>
+ </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton_remove_layer</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_pushbutton_remove_layer_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>189</x>
+     <y>546</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>475</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_gen</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_pushbutton_gen_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1066</x>
+     <y>647</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1012</x>
+     <y>637</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_exp</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_pushbutton_exp_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1040</x>
+     <y>673</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1010</x>
+     <y>676</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget_input</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_listwidget_input_currentRowChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>214</x>
+     <y>351</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNew</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_action_new()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_action_open()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSave</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_action_save()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionAdd</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_action_add()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>event_pushbutton_remove_layer_clicked()</slot>
+  <slot>event_pushbutton_gen_clicked()</slot>
+  <slot>event_pushbutton_exp_clicked()</slot>
+  <slot>event_listwidget_input_currentRowChanged(int)</slot>
+  <slot>event_action_new()</slot>
+  <slot>event_action_open()</slot>
+  <slot>event_action_save()</slot>
+  <slot>event_action_add()</slot>
+ </slots>
 </ui>
