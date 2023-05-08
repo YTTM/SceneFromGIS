@@ -42,6 +42,7 @@ class Ui_Dialog(object):
         self.comboBox_layer_type.addItem("")
         self.comboBox_layer_type.addItem("")
         self.comboBox_layer_type.addItem("")
+        self.comboBox_layer_type.addItem("")
         self.gridLayout.addWidget(self.comboBox_layer_type, 1, 1, 1, 2)
         self.label_file_info = QtWidgets.QLabel(Dialog)
         self.label_file_info.setText("")
@@ -59,6 +60,7 @@ class Ui_Dialog(object):
         self.buttonBox.accepted.connect(Dialog.accept) # type: ignore
         self.buttonBox.rejected.connect(Dialog.reject) # type: ignore
         self.pushButton_file_browser.clicked.connect(Dialog.pushbutton_file_browser_clicked) # type: ignore
+        self.lineEdit_file_path.textChanged['QString'].connect(Dialog.linedit_file_path_textchanged) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -68,11 +70,12 @@ class Ui_Dialog(object):
         self.label_3.setText(_translate("Dialog", "File info"))
         self.label_1.setText(_translate("Dialog", "File path"))
         self.pushButton_file_browser.setText(_translate("Dialog", "📁"))
-        self.comboBox_layer_type.setItemText(0, _translate("Dialog", "path (line)"))
-        self.comboBox_layer_type.setItemText(1, _translate("Dialog", "building (line)"))
-        self.comboBox_layer_type.setItemText(2, _translate("Dialog", "building (polygon)"))
-        self.comboBox_layer_type.setItemText(3, _translate("Dialog", "forest (line)"))
-        self.comboBox_layer_type.setItemText(4, _translate("Dialog", "forest (polygon)"))
-        self.comboBox_layer_type.setItemText(5, _translate("Dialog", "forest (point)"))
-        self.comboBox_layer_type.setItemText(6, _translate("Dialog", "water (line)"))
-        self.comboBox_layer_type.setItemText(7, _translate("Dialog", "water (polygon)"))
+        self.comboBox_layer_type.setItemText(0, _translate("Dialog", "heightmap"))
+        self.comboBox_layer_type.setItemText(1, _translate("Dialog", "path (line)"))
+        self.comboBox_layer_type.setItemText(2, _translate("Dialog", "building (line)"))
+        self.comboBox_layer_type.setItemText(3, _translate("Dialog", "building (polygon)"))
+        self.comboBox_layer_type.setItemText(4, _translate("Dialog", "forest (line)"))
+        self.comboBox_layer_type.setItemText(5, _translate("Dialog", "forest (polygon)"))
+        self.comboBox_layer_type.setItemText(6, _translate("Dialog", "forest (point)"))
+        self.comboBox_layer_type.setItemText(7, _translate("Dialog", "water (line)"))
+        self.comboBox_layer_type.setItemText(8, _translate("Dialog", "water (polygon)"))

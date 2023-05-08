@@ -49,6 +49,11 @@
     <widget class="QComboBox" name="comboBox_layer_type">
      <item>
       <property name="text">
+       <string>heightmap</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>path (line)</string>
       </property>
      </item>
@@ -171,8 +176,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEdit_file_path</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>Dialog</receiver>
+   <slot>linedit_file_path_textchanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>14</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>66</x>
+     <y>23</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>pushbutton_file_browser_clicked()</slot>
+  <slot>linedit_file_path_textchanged()</slot>
  </slots>
 </ui>
