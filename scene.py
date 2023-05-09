@@ -60,6 +60,13 @@ class Scene:
             self.layers[-1][3] = bounds, size
             self.layers[-1][4] = view
             self.layers[-1][5] = data
+        elif layer_geom_type[layer_type] == LayerGeomType.LINE:
+            data, (bounds), (size) = vector.read_line(filename, self.crs)
+            view = vector.view_line(data, bounds, size)
+            self.layers[-1][2] = True
+            self.layers[-1][3] = bounds, size
+            self.layers[-1][4] = view
+            self.layers[-1][5] = data
         '''
         else:
             vector.read()

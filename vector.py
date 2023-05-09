@@ -4,10 +4,9 @@ import geopandas
 import skimage
 
 
-def read_polygon(filename, crs):
+def read_gis(filename, crs):
     # read gis
     gis = geopandas.read_file(filename)
-    poly = []
 
     y_min, x_min, y_max, x_max = gis.total_bounds
     x_size, y_size = math.ceil(abs(x_min - x_max)), math.ceil(abs(y_min - y_max))
@@ -16,6 +15,13 @@ def read_polygon(filename, crs):
         print(f'{gis.crs} != {crs}')
         raise AssertionError
 
+    return gis, (x_min, x_max, y_min, y_max), (x_size, y_size)
+
+
+def read_polygon(filename, crs):
+    gis, bounds, size = read_gis(filename, crs)
+    poly = []
+
     for index, poi in gis.iterrows():
         # read polygon coords
         c, r = gis.loc[index, 'geometry'].exterior.coords.xy
@@ -23,7 +29,24 @@ def read_polygon(filename, crs):
         c = np.array(c)
         poly.append((r, c))
 
-    return poly, (x_min, x_max, y_min, y_max), (x_size, y_size)
+    return poly, bounds, size
+
+
+def read_line(filename, crs):
+    gis, bounds, size = read_gis(filename, crs)
+    lines = []
+
+    # read all lines
+    for index, poi in gis.iterrows():
+        line = []
+        # read line coords
+        coords = gis.loc[index, 'geometry'].coords
+        for c in range(len(coords)):
+            y0, x0, z0 = coords[c]
+            line.append((x0, y0, z0))
+        lines.append(line)
+
+    return lines, bounds, size
 
 
 def view_polygon(data, bounds, size):
@@ -55,3 +78,41 @@ def view_polygon(data, bounds, size):
         polygon_map[rr, cc] = 255
 
     return polygon_map
+
+
+def view_line(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    # limit size of output for preview
+    div = 1
+    while (x_size/div) * (y_size/div) > 500 * 500:
+        div += 1
+
+    line_map = np.zeros((math.ceil(x_size/div), math.ceil(y_size/div)), dtype=np.uint8)
+
+    for line in data:
+        for c in range(len(line) -1):
+            # read coords
+            x0, y0, z0 = line[c]
+            x1, y1, z1 = line[c + 1]
+            # change coords to current area
+            x0 = (x0 - x_min)
+            y0 = (y0 - y_min)
+            x1 = (x1 - x_min)
+            y1 = (y1 - y_min)
+            # invert X
+            x0 = x0 * -1 + x_size
+            x1 = x1 * -1 + x_size
+            # preview divider
+            x0 /= div
+            x1 /= div
+            y0 /= div
+            y1 /= div
+            # draw line
+            rr, cc = skimage.draw.line(round(x0), round(y0), round(x1), round(y1))
+            if any(rr < 0) or any(cc < 0) or any(rr >= line_map.shape[0]) or any(cc >= line_map.shape[1]):
+                continue
+            line_map[rr, cc] = 255
+
+    return line_map
