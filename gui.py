@@ -18,18 +18,13 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
-        for l in range(len(scene.layer_types)):
-            self.comboBox_1.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
         self.setAcceptDrops(True)
 
         self.current_scene = scene.Scene()
 
     def add_layer(self, filename, type):
         self.lineEdit_crs.setEnabled(False)
-        r = self.current_scene.add_layer(filename, type)
-
-        if type == 0:
-            self.lineEdit_area.setText(str(r))
+        self.current_scene.add_layer(filename, type)
 
         item = QListWidgetItem(f'{scene.layer_symbol[type]} {os.path.basename(filename)}', self.listWidget_input)
         self.listWidget_input.addItem(item)
@@ -52,18 +47,13 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             self.graphicsView_2d.clear()
             return
 
-        view = np.stack((view,) * 3, axis=-1)
-        height, width, channel = view.shape
-        bytesPerLine = 3 * width
-        qImg = QImage(view.tobytes(), width, height, bytesPerLine, QImage.Format_RGB888)  # .rgbSwapped()
-        pixmap = QPixmap.fromImage(qImg)
+        pixmap = qpixmap_from_grayscale_array(view)
         pixmap = pixmap.scaled(self.graphicsView_2d.geometry().width() - 25,
                                self.graphicsView_2d.geometry().height() - 25,
                                QtCore.Qt.KeepAspectRatio)
         self.graphicsView_2d.setPixmap(pixmap)
 
     def event_pushbutton_remove_layer_clicked(self):
-        print("event_pushButton_remove_layer_clicked")
         self.remove_layer(self.listWidget_input.currentRow())
 
     def event_pushbutton_gen_clicked(self):
@@ -79,27 +69,21 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         if i < 0:
             return
 
-        self.statusbar.showMessage(self.current_scene.layers[i][0])
-        self.comboBox_1.setCurrentIndex(self.current_scene.layers[i][1])
-        self.update_view_2d(self.current_scene.layers[i][3])
+        layer = self.current_scene.get_layer(i)
+        self.statusbar.showMessage(layer[0])
+        self.update_view_2d(layer[4])
+        j = layer[1]
+        self.label_type.setText(f'{scene.layer_symbol[j]} {scene.layer_types[j]}')
 
     def event_listwidget_input_doubleclicked(self, modelindex):
-        print("event_listwidget_input_doubleclicked")
-        # todo: update area
+        i = self.listWidget_input.currentRow()
+        layer = self.current_scene.get_layer(i)
+        if layer[1] == 0:
+            self.lineEdit_area.setText(str(layer[3][0]))
 
     def event_lineedit_crs_textchanged(self, crs):
         # print("event_lineedit_crs_textchanged")
         self.current_scene.crs = str(crs)
-
-    def event_comboBox_1_activated(self, j):
-        # print("event_comboBox_1_currentindexchanged", j)
-        i = self.listWidget_input.currentRow()
-        if i < 0:
-            return
-        self.current_scene.layers[i][1] = j
-        item = self.listWidget_input.item(i)
-        item.setText(f'{scene.layer_symbol[self.current_scene.layers[i][1]]} '
-                     f'{os.path.basename(self.current_scene.layers[i][0])}')
 
     def event_action_new(self):
         # todo: new project
@@ -199,6 +183,19 @@ class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
         self.result['filename'] = self.lineEdit_file_path.text()
         self.result['type'] = self.comboBox_layer_type.currentIndex()
         super(DialogImport, self).accept()
+
+
+def qpixmap_from_rgb_array(view):
+    height, width, channel = view.shape
+    bytesPerLine = 3 * width
+    qImg = QImage(view.tobytes(), width, height, bytesPerLine, QImage.Format_RGB888)
+    pixmap = QPixmap.fromImage(qImg)
+    return pixmap
+
+
+def qpixmap_from_grayscale_array(view):
+    view = np.stack((view,) * 3, axis=-1)
+    return qpixmap_from_rgb_array(view)
 
 
 def start(argv):
