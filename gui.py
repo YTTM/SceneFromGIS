@@ -44,14 +44,14 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
     def update_view_2d(self, view):
         if view is None:
-            self.graphicsView_2d.clear()
+            self.graphicsView_2d_input.clear()
             return
 
         pixmap = qpixmap_from_grayscale_array(view)
-        pixmap = pixmap.scaled(self.graphicsView_2d.geometry().width() - 25,
-                               self.graphicsView_2d.geometry().height() - 25,
+        pixmap = pixmap.scaled(self.graphicsView_2d_input.geometry().width() - 25,
+                               self.graphicsView_2d_input.geometry().height() - 25,
                                QtCore.Qt.KeepAspectRatio)
-        self.graphicsView_2d.setPixmap(pixmap)
+        self.graphicsView_2d_input.setPixmap(pixmap)
 
     def event_pushbutton_remove_layer_clicked(self):
         self.remove_layer(self.listWidget_input.currentRow())
