@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.lineEdit_crs.setEnabled(False)
         self.current_scene.add_layer(filename, type)
 
-        item = QListWidgetItem(f'{scene.layer_symbol[type]} {os.path.basename(filename)}', self.listWidget_input)
+        item = QListWidgetItem(f'{scene.layer_symbols[type]} {os.path.basename(filename)}', self.listWidget_input)
         self.listWidget_input.addItem(item)
 
     def remove_layer(self, i):
@@ -69,17 +69,16 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         if i < 0:
             return
 
-        layer = self.current_scene.get_layer(i)
-        self.statusbar.showMessage(layer[0])
-        self.update_view_2d(layer[4])
-        j = layer[1]
-        self.label_type.setText(f'{scene.layer_symbol[j]} {scene.layer_types[j]}')
+        self.statusbar.showMessage(self.current_scene.get_layer_filename(i))
+        self.update_view_2d(self.current_scene.get_layer_view(i))
+        j = self.current_scene.get_layer_type(i)
+        self.label_type.setText(f'{scene.layer_symbols[j]} {scene.layer_names[j]}')
 
     def event_listwidget_input_doubleclicked(self, modelindex):
         i = self.listWidget_input.currentRow()
-        layer = self.current_scene.get_layer(i)
-        if layer[1] == 0:
-            self.lineEdit_area.setText(str(layer[3][0]))
+        layer_type = self.current_scene.get_layer_type(i)
+        if layer_type == scene.LayerType.HEIGHTMAP:
+            self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)[0]))
 
     def event_lineedit_crs_textchanged(self, crs):
         # print("event_lineedit_crs_textchanged")
@@ -123,8 +122,8 @@ class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
         super(DialogImport, self).__init__()
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
-        for l in range(len(scene.layer_types)):
-            self.comboBox_layer_type.addItem(f'{scene.layer_symbol[l]} {scene.layer_types[l]}')
+        for l in range(len(scene.layer_names)):
+            self.comboBox_layer_type.addItem(f'{scene.layer_symbols[l]} {scene.layer_names[l]}')
 
         self.result = {'filename': None,
                        'type': None}
