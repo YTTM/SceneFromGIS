@@ -3,18 +3,18 @@ import rasterio
 
 
 def read(filename, crs):
-    elevation_gis = rasterio.open(filename)
-    elevation_arr = elevation_gis.read()[0]
+    gis = rasterio.open(filename)
+    arr = gis.read()[0]
 
-    y_min, x_min, y_max, x_max = elevation_gis.bounds
-    x_size = elevation_gis.height
-    y_size = elevation_gis.width
+    y_min, x_min, y_max, x_max = gis.bounds
+    x_size = gis.height
+    y_size = gis.width
 
-    if elevation_gis.crs != crs:
-        print(f'{elevation_gis.crs} != {crs}')
+    if gis.crs != crs:
+        print(f'{gis.crs} != {crs}')
         raise AssertionError
 
-    return elevation_arr, (x_min, x_max, y_min, y_max), (x_size, y_size)
+    return arr, (x_min, x_max, y_min, y_max), (x_size, y_size)
 
 
 def view(data):
