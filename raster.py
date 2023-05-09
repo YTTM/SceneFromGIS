@@ -7,13 +7,14 @@ def read(filename, crs):
     elevation_arr = elevation_gis.read()[0]
 
     y_min, x_min, y_max, x_max = elevation_gis.bounds
-    z_min, z_max = elevation_arr.min(), elevation_arr.max()
+    x_size = elevation_gis.height
+    y_size = elevation_gis.width
 
     if elevation_gis.crs != crs:
         print(f'{elevation_gis.crs} != {crs}')
         raise AssertionError
 
-    return elevation_arr, (x_min, x_max, y_min, y_max, z_min, z_max)
+    return elevation_arr, (x_min, x_max, y_min, y_max), (x_size, y_size)
 
 
 def view(data):
