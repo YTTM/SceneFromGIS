@@ -49,14 +49,18 @@ class Scene:
         if layer_geom_type[layer_type] == LayerGeomType.HEIGHTMAP:
             data, (bounds), (size) = raster.read(filename, crs=self.crs)
             view = raster.view(data)
-
+            self.layers[-1][2] = True
+            self.layers[-1][3] = bounds, size
+            self.layers[-1][4] = view
+            self.layers[-1][5] = data
+        elif layer_geom_type[layer_type] == LayerGeomType.POLYGON:
+            data, (bounds), (size) = vector.read_polygon(filename, self.crs)
+            view = vector.view_polygon(data, bounds, size)
             self.layers[-1][2] = True
             self.layers[-1][3] = bounds, size
             self.layers[-1][4] = view
             self.layers[-1][5] = data
         '''
-        elif layer_geom_type[layer_type] == LayerGeomType.POLYGON:
-            data = vector.read_polygon(filename, self.crs)
         else:
             vector.read()
         '''
