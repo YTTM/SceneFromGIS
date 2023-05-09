@@ -14,23 +14,24 @@ layer_symbol = ['🏞️', '🛣️', '🏠', '🧱', '🌿', '🌳', '🌲', '�
 
 class Scene:
     def __init__(self, crs='EPSG:2154'):
-        # layer format : [filename, layer_type, layer_valid, layer_view, layer_data]
+        # layer format : [filename, layer_type_id, layer_valid, layer_info, layer_view]
         self.layers = []
+        self.layers_data = []
         self.crs = crs
         return
 
     def add_layer(self, filename, layer_type):
         self.layers.append([filename, layer_type, None, None, None])
+        self.layers_data.append(None)
 
-        if layer_types_id[layer_type] == 0: # heightmap
-            data, (bounds) = raster.read(filename, crs=self.crs)
-            x_min, x_max, y_min, y_max, z_min, z_max = bounds
+        if layer_types_id[layer_type] == 0:  # heightmap
+            data, (bounds), (size) = raster.read(filename, crs=self.crs)
             view = raster.view(data)
 
             self.layers[-1][2] = True
-            self.layers[-1][3] = view
-            self.layers[-1][4] = (data, bounds)
-            return bounds
+            self.layers[-1][3] = bounds, size
+            self.layers[-1][4] = view
+            self.layers_data[-1] = data
         '''
         elif layer_types_id[layer_type] == 2: # polygon
             data = vector.read_polygon(filename, self.crs)
@@ -39,7 +40,13 @@ class Scene:
         else:
             vector.read()
         '''
-        return
+
+    def get_layer(self, i):
+        return self.layers[i]
+
+    def get_layer_data(self, i):
+        return self.layers_data[i]
 
     def remove_layer(self, i):
         del self.layers[i]
+        del self.layers_data[i]
