@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import rasterio
 
@@ -21,3 +22,20 @@ def view(data):
     mini, maxi = data.min(), data.max()
     # normalize 0 - 255
     return (((data - mini) / (maxi - mini))*255.0).astype(np.uint8)
+
+
+def build(data, bounds, size, block_size=1, z_factor=1):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    x_blocks = math.ceil(x_size / block_size)
+    y_blocks = math.ceil(y_size / block_size)
+    x_diff = x_blocks * block_size - x_size
+    y_diff = y_blocks * block_size - y_size
+
+    arr = np.zeros((x_blocks * block_size, y_blocks * block_size, 1), dtype=np.uint16)
+    arr[0:data.shape[0], 0:data.shape[1], 0] = data * int(z_factor)
+
+    print(f'{"output size":24}: {x_blocks * block_size} x {y_blocks * block_size} ({x_blocks} x {y_blocks})')
+
+    return arr

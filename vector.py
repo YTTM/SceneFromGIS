@@ -127,7 +127,7 @@ def build_polygon(data, bounds, size):
     x_size, y_size = size
 
     # create empty map
-    polygon_map = np.zeros(size, dtype=np.uint16)
+    polygon_map = np.zeros((x_size, y_size, 1), dtype=np.uint16)
 
     for polygon in data:
         r = polygon[0]
@@ -151,7 +151,7 @@ def build_line(data, bounds, size):
     x_size, y_size = size
 
     # create empty map
-    line_map = np.zeros(size, dtype=np.uint16)
+    line_map = np.zeros((x_size, y_size, 1), dtype=np.uint16)
 
     for line in data:
         for c in range(len(line) -1):

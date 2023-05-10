@@ -114,6 +114,11 @@ class Scene:
     def build(self, bounds, size):
         self.outputs = []
 
+        layers = self.get_layers_by_type(LayerType.HEIGHTMAP)
+        for l in layers:
+            data = raster.build(self.layers[l][5], bounds, size)
+            self.outputs.append((f'HEIGHTMAP_{l:02}', data))
+
         layers = self.get_layers_by_type(LayerType.PATH_LINE)
         for l in layers:
             data = vector.build_line(self.layers[l][5], bounds, size)

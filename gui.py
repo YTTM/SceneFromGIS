@@ -108,7 +108,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_listwidget_output_currentrowchanged(self, i):
         if i < 0:
             return
-        self.update_view_2d_output((self.current_scene.get_build_data(i)/256).astype(np.uint8))
+        self.update_view_2d_output((self.current_scene.get_build_data(i)[:,:,0]/256).astype(np.uint8))
 
     def event_lineedit_crs_textchanged(self, crs):
         self.current_scene.crs = str(crs)
