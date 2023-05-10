@@ -2,6 +2,7 @@ import os
 import json
 
 import numpy as np
+from PIL import Image
 
 import scene
 
@@ -48,8 +49,6 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             self.graphicsView_2d_input.clear()
             return
 
-        print(view.shape, view.dtype)
-
         pixmap = qpixmap_from_grayscale_array(view)
         pixmap = pixmap.scaled(self.graphicsView_2d_input.geometry().width() - 25,
                                self.graphicsView_2d_input.geometry().height() - 25,
@@ -88,8 +87,18 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 self.listWidget_output.addItem(str(b[0]))
 
     def event_pushbutton_exp_clicked(self):
-        print("event_pushButton_exp_clicked")
-        # todo: export output
+        foldername = QFileDialog.getExistingDirectory(self, "Export folder")
+        if len(foldername) > 0:
+            if os.path.isdir(foldername):
+                builds = self.current_scene.get_builds()
+                for b in builds:
+                    im = Image.fromarray(b[1], 'I;16')
+                    im.save(foldername + f'/{b[0]}.png')
+            else:
+                QMessageBox.critical(self,
+                                     "Not a folder",
+                                     f"{foldername} is not a valid folder")
+
 
     def event_listwidget_input_currentrowchanged(self, i):
         if i < 0:
