@@ -1,4 +1,5 @@
 import os
+import json
 
 import numpy as np
 
@@ -65,7 +66,6 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         # todo: export output
 
     def event_listwidget_input_currentrowchanged(self, i):
-        # print("event_listwidget_input_currentRowChanged", i)
         if i < 0:
             return
 
@@ -81,23 +81,51 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)[0]))
 
     def event_lineedit_crs_textchanged(self, crs):
-        # print("event_lineedit_crs_textchanged")
         self.current_scene.crs = str(crs)
 
     def event_action_new(self):
-        # todo: new project
-        print("event_action_new")
+        del self.current_scene
+        self.current_scene = scene.Scene()
+        self.lineEdit_crs.setEnabled(True)
+        self.lineEdit_area.setText('')
+        self.label_type.setText('')
+        self.listWidget_input.clear()
+        self.listWidget_output.clear()
 
     def event_action_open(self):
-        # todo: load project (json)
-        print("event_action_open")
+        self.event_action_new()
+
+        filename = QFileDialog.getOpenFileName(self, "Open file", None, "(*.json)")
+        if len(filename[0]) > 0:
+            with open(filename[0], 'r') as outfile:
+                data = json.load(outfile)
+
+            self.lineEdit_area.setText(data['area'])
+            self.lineEdit_crs.setText(data['crs'])
+            self.lineEdit_crs.setEnabled(False)
+            self.current_scene.crs = data['crs']
+
+            i = 0
+            while str(i) in data:
+                x = data[str(i)]
+                self.add_layer(x['file'], x['type'])
+                i += 1
 
     def event_action_save(self):
-        # todo: save project (json)
-        print("event_action_save")
+        filename = QFileDialog.getSaveFileName(self, "Open file", None, "(*.json)")
+        if len(filename[0]) > 0:
+            data = dict()
+            data['crs'] = self.current_scene.crs
+            data['area'] = self.lineEdit_area.text()
+
+            for i in range(len(self.current_scene.layers)):
+                data[i] = {'file': self.current_scene.get_layer_filename(i),
+                           'type': int(self.current_scene.get_layer_type(i))}
+
+            with open(filename[0], 'w') as outfile:
+                json.dump(data, outfile)
 
     def event_action_add(self):
-        # print("event_action_add")
         self.add_layer_dialog("")
 
     def dragEnterEvent(self, event):

@@ -70,7 +70,7 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QListView" name="listView_output"/>
+       <widget class="QListWidget" name="listWidget_output"/>
       </item>
       <item row="3" column="0">
        <widget class="QPushButton" name="pushButton_gen">
@@ -286,20 +286,32 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionAdd">
    <property name="text">
     <string>Add</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>
@@ -312,7 +324,7 @@
   <tabstop>spinBox_ushort_3</tabstop>
   <tabstop>spinBox_ushort_4</tabstop>
   <tabstop>spinBox_ushort_5</tabstop>
-  <tabstop>listView_output</tabstop>
+  <tabstop>listWidget_output</tabstop>
   <tabstop>checkBox_gen_2d</tabstop>
   <tabstop>checkBox_gen_3d</tabstop>
   <tabstop>pushButton_gen</tabstop>
