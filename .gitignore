@@ -161,3 +161,6 @@ cython_debug/
 
 # Example and test data
 data/
+output/
+# Project file
+*.json
