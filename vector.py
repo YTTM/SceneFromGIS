@@ -42,7 +42,11 @@ def read_line(filename, crs):
         # read line coords
         coords = gis.loc[index, 'geometry'].coords
         for c in range(len(coords)):
-            y0, x0, z0 = coords[c]
+            if len(coords[c]) == 2:
+                y0, x0 = coords[c]
+                z0 = 0
+            else:
+                y0, x0, z0 = coords[c]
             line.append((x0, y0, z0))
         lines.append(line)
 
@@ -116,3 +120,27 @@ def view_line(data, bounds, size):
             line_map[rr, cc] = 255
 
     return line_map
+
+
+def build_polygon(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    # create empty map
+    polygon_map = np.zeros(size, dtype=np.uint16)
+
+    for polygon in data:
+        r = polygon[0]
+        c = polygon[1]
+        # change coords to current area
+        r = (r - x_min)
+        c = (c - y_min)
+        # invert X
+        r = r * -1 + x_size
+        # draw polygon
+        rr, cc = skimage.draw.polygon(r, c)
+        if any(rr < 0) or any(cc < 0) or any(rr >= polygon_map.shape[0]) or any(cc >= polygon_map.shape[1]):
+            continue
+        polygon_map[rr, cc] = 65535
+
+    return polygon_map
