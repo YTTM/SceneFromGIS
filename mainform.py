@@ -185,6 +185,7 @@ class Ui_MainWindow(object):
         self.actionAdd.triggered.connect(MainWindow.event_action_add) # type: ignore
         self.listWidget_input.doubleClicked['QModelIndex'].connect(MainWindow.event_listwidget_input_doubleclicked) # type: ignore
         self.lineEdit_crs.textChanged['QString'].connect(MainWindow.event_lineedit_crs_textchanged) # type: ignore
+        self.listWidget_output.currentRowChanged['int'].connect(MainWindow.event_listwidget_output_currentrowchanged) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.lineEdit_crs, self.lineEdit_area)
         MainWindow.setTabOrder(self.lineEdit_area, self.listWidget_input)

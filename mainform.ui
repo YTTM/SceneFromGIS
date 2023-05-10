@@ -339,8 +339,8 @@
    <slot>event_pushbutton_remove_layer_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>546</y>
+     <x>199</x>
+     <y>538</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -483,12 +483,28 @@
    <slot>event_lineedit_crs_textchanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>128</x>
-     <y>37</y>
+     <x>168</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
      <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget_output</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_listwidget_output_currentrowchanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1046</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1010</x>
+     <y>316</y>
     </hint>
    </hints>
   </connection>
@@ -505,5 +521,6 @@
   <slot>event_comboBox_1_activated(int)</slot>
   <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
   <slot>event_lineedit_crs_textchanged(QString)</slot>
+  <slot>event_listwidget_output_currentrowchanged(int)</slot>
  </slots>
 </ui>

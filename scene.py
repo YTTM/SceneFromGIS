@@ -108,6 +108,9 @@ class Scene:
     def get_builds(self):
         return self.outputs
 
+    def get_build_data(self, i):
+        return self.outputs[i][1]
+
     def build(self, bounds, size):
         self.outputs = []
 

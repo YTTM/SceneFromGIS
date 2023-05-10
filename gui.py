@@ -48,16 +48,30 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             self.graphicsView_2d_input.clear()
             return
 
+        print(view.shape, view.dtype)
+
         pixmap = qpixmap_from_grayscale_array(view)
         pixmap = pixmap.scaled(self.graphicsView_2d_input.geometry().width() - 25,
                                self.graphicsView_2d_input.geometry().height() - 25,
                                QtCore.Qt.KeepAspectRatio)
         self.graphicsView_2d_input.setPixmap(pixmap)
 
+    def update_view_2d_output(self, view):
+        if view is None:
+            self.graphicsView_2d_output.clear()
+            return
+
+        pixmap = qpixmap_from_grayscale_array(view)
+        pixmap = pixmap.scaled(self.graphicsView_2d_output.geometry().width() - 25,
+                               self.graphicsView_2d_output.geometry().height() - 25,
+                               QtCore.Qt.KeepAspectRatio)
+        self.graphicsView_2d_output.setPixmap(pixmap)
+
     def event_pushbutton_remove_layer_clicked(self):
         self.remove_layer(self.listWidget_input.currentRow())
 
     def event_pushbutton_gen_clicked(self):
+        self.listWidget_output.clear()
         area = self.lineEdit_area.text()
         # todo: this is not safe
         area = eval(area)
@@ -80,7 +94,6 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_listwidget_input_currentrowchanged(self, i):
         if i < 0:
             return
-
         self.statusbar.showMessage(self.current_scene.get_layer_filename(i))
         self.update_view_2d(self.current_scene.get_layer_view(i))
         j = self.current_scene.get_layer_type(i)
@@ -91,6 +104,11 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         layer_type = self.current_scene.get_layer_type(i)
         if layer_type == scene.LayerType.HEIGHTMAP:
             self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)))
+
+    def event_listwidget_output_currentrowchanged(self, i):
+        if i < 0:
+            return
+        self.update_view_2d_output((self.current_scene.get_build_data(i)/256).astype(np.uint8))
 
     def event_lineedit_crs_textchanged(self, crs):
         self.current_scene.crs = str(crs)
