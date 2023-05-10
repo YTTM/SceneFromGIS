@@ -58,8 +58,20 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.remove_layer(self.listWidget_input.currentRow())
 
     def event_pushbutton_gen_clicked(self):
-        print("event_pushButton_gen_clicked")
-        # todo: generate output
+        area = self.lineEdit_area.text()
+        # todo: this is not safe
+        area = eval(area)
+
+        if type(area) != tuple or len(area) != 2 or len(area[0]) != 4 or len(area[1]) != 2:
+            QMessageBox.critical(self,
+                                 "Invalid area",
+                                 f"{area} is not a valid area")
+        else:
+            bounds, size = area
+            self.current_scene.build(bounds, size)
+            builds = self.current_scene.get_builds()
+            for b in builds:
+                self.listWidget_output.addItem(str(b[0]))
 
     def event_pushbutton_exp_clicked(self):
         print("event_pushButton_exp_clicked")
@@ -78,7 +90,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         i = self.listWidget_input.currentRow()
         layer_type = self.current_scene.get_layer_type(i)
         if layer_type == scene.LayerType.HEIGHTMAP:
-            self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)[0]))
+            self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)))
 
     def event_lineedit_crs_textchanged(self, crs):
         self.current_scene.crs = str(crs)

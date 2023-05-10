@@ -41,9 +41,10 @@ class Scene:
         # layer format : [filename, type, valid, info, view, data, option]
         self.layers = []
         self.crs = crs
+        self.outputs = []
         return
 
-    def add_layer(self, filename, layer_type):
+    def add_layer(self, filename, layer_type, create_view=True):
         self.layers.append([filename, LayerType(layer_type), None, None, None, None, None])
 
         if layer_geom_type[layer_type] == LayerGeomType.HEIGHTMAP:
@@ -51,26 +52,27 @@ class Scene:
             view = raster.view(data)
             self.layers[-1][2] = True
             self.layers[-1][3] = bounds, size
-            self.layers[-1][4] = view
+            if create_view:
+                self.layers[-1][4] = view
             self.layers[-1][5] = data
         elif layer_geom_type[layer_type] == LayerGeomType.POLYGON:
             data, (bounds), (size) = vector.read_polygon(filename, self.crs)
             view = vector.view_polygon(data, bounds, size)
             self.layers[-1][2] = True
             self.layers[-1][3] = bounds, size
-            self.layers[-1][4] = view
+            if create_view:
+                self.layers[-1][4] = view
             self.layers[-1][5] = data
         elif layer_geom_type[layer_type] == LayerGeomType.LINE:
             data, (bounds), (size) = vector.read_line(filename, self.crs)
             view = vector.view_line(data, bounds, size)
             self.layers[-1][2] = True
             self.layers[-1][3] = bounds, size
-            self.layers[-1][4] = view
+            if create_view:
+                self.layers[-1][4] = view
             self.layers[-1][5] = data
-        '''
         else:
-            vector.read()
-        '''
+            raise NotImplementedError
 
     def get_layer(self, i):
         return self.layers[i]
@@ -95,3 +97,31 @@ class Scene:
 
     def remove_layer(self, i):
         del self.layers[i]
+
+    def get_layers_by_type(self, type):
+        layers = []
+        for i in range(len(self.layers)):
+            if self.layers[i][1] == type:
+                layers.append(i)
+        return layers
+
+    def get_builds(self):
+        return self.outputs
+
+    def build(self, bounds, size):
+        self.outputs = []
+
+        layers = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
+        for l in layers:
+            data = vector.build_polygon(self.layers[l][5], bounds, size)
+            self.outputs.append((f'BUILDING_POLYGON_{l:02}', data))
+
+        layers = self.get_layers_by_type(LayerType.FOREST_POLYGON)
+        for l in layers:
+            data = vector.build_polygon(self.layers[l][5], bounds, size)
+            self.outputs.append((f'FOREST_POLYGON_{l:02}', data))
+
+        layers = self.get_layers_by_type(LayerType.WATER_POLYGON)
+        for l in layers:
+            data = vector.build_polygon(self.layers[l][5], bounds, size)
+            self.outputs.append((f'WATER_POLYGON_{l:02}', data))
