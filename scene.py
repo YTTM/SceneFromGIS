@@ -114,6 +114,27 @@ class Scene:
     def build(self, bounds, size):
         self.outputs = []
 
+        layers = self.get_layers_by_type(LayerType.PATH_LINE)
+        for l in layers:
+            data = vector.build_line(self.layers[l][5], bounds, size)
+            self.outputs.append((f'PATH_LINE_{l:02}', data))
+
+        layers = self.get_layers_by_type(LayerType.BUILDING_LINE)
+        for l in layers:
+            data = vector.build_line(self.layers[l][5], bounds, size)
+            self.outputs.append((f'BUILDING_LINE_{l:02}', data))
+
+        layers = self.get_layers_by_type(LayerType.FOREST_LINE)
+        for l in layers:
+            data = vector.build_line(self.layers[l][5], bounds, size)
+            self.outputs.append((f'FOREST_LINE_{l:02}', data))
+
+        layers = self.get_layers_by_type(LayerType.WATER_LINE)
+        for l in layers:
+            data = vector.build_line(self.layers[l][5], bounds, size)
+            self.outputs.append((f'WATER_LINE_{l:02}', data))
+
+
         layers = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
         for l in layers:
             data = vector.build_polygon(self.layers[l][5], bounds, size)

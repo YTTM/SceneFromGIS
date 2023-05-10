@@ -144,3 +144,32 @@ def build_polygon(data, bounds, size):
         polygon_map[rr, cc] = 65535
 
     return polygon_map
+
+
+def build_line(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    # create empty map
+    line_map = np.zeros(size, dtype=np.uint16)
+
+    for line in data:
+        for c in range(len(line) -1):
+            # read coords
+            x0, y0, z0 = line[c]
+            x1, y1, z1 = line[c + 1]
+            # change coords to current area
+            x0 = (x0 - x_min)
+            y0 = (y0 - y_min)
+            x1 = (x1 - x_min)
+            y1 = (y1 - y_min)
+            # invert X
+            x0 = x0 * -1 + x_size
+            x1 = x1 * -1 + x_size
+            # draw line
+            rr, cc = skimage.draw.line(round(x0), round(y0), round(x1), round(y1))
+            if any(rr < 0) or any(cc < 0) or any(rr >= line_map.shape[0]) or any(cc >= line_map.shape[1]):
+                continue
+            line_map[rr, cc] = 65535
+
+    return line_map
