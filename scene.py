@@ -55,6 +55,7 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
+            self.layers[-1][6] = [1, 0, None, None, None]
         elif layer_geom_type[layer_type] == LayerGeomType.POLYGON:
             data, (bounds), (size) = vector.read_polygon(filename, self.crs)
             view = vector.view_polygon(data, bounds, size)
@@ -63,6 +64,7 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
+            self.layers[-1][6] = [None, None, 0, 0, 0]
         elif layer_geom_type[layer_type] == LayerGeomType.LINE:
             data, (bounds), (size) = vector.read_line(filename, self.crs)
             view = vector.view_line(data, bounds, size)
@@ -71,6 +73,7 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
+            self.layers[-1][6] = [None, None, 0, 0, 0]
         else:
             raise NotImplementedError
 
@@ -94,6 +97,12 @@ class Scene:
 
     def get_layer_data(self, i):
         return self.layers[i][5]
+
+    def get_layer_option(self, i):
+        return self.layers[i][6]
+
+    def set_layer_option(self, layer, option_id, option_val):
+        self.layers[layer][6][option_id] = option_val
 
     def remove_layer(self, i):
         del self.layers[i]
@@ -154,3 +163,7 @@ class Scene:
         for l in layers:
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'WATER_POLYGON_{l:02}', data))
+
+
+def geom_type(layer_type):
+    return layer_geom_type[layer_type]

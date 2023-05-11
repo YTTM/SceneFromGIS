@@ -22,6 +22,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.setupUi(self)
         self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
         self.setAcceptDrops(True)
+        self.view_3d.set_background('E0E0E0')
 
         self.current_scene = scene.Scene()
 
@@ -115,12 +116,65 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                      f"{foldername} is not a valid folder")
 
     def event_listwidget_input_currentrowchanged(self, i):
+        self.label_type.setText('')
+        self.spinBox_z_factor.setEnabled(False)
+        self.spinBox_elevation_smoothing.setEnabled(False)
+        self.spinBox_dilation.setEnabled(False)
+        self.spinBox_flattening.setEnabled(False)
+        self.spinBox_elevation_diff.setEnabled(False)
+
         if i < 0:
             return
         self.statusbar.showMessage(self.current_scene.get_layer_filename(i))
         self.update_view_2d(self.current_scene.get_layer_view(i))
         j = self.current_scene.get_layer_type(i)
         self.label_type.setText(f'{scene.layer_symbols[j]} {scene.layer_names[j]}')
+        # layer properties
+        opt = self.current_scene.get_layer_option(i)
+
+        if scene.geom_type(j) == scene.LayerGeomType.HEIGHTMAP:
+            self.spinBox_z_factor.setValue(opt[0])
+            self.spinBox_elevation_smoothing.setValue(opt[1])
+            self.spinBox_z_factor.setEnabled(True)
+            self.spinBox_elevation_smoothing.setEnabled(True)
+        elif scene.geom_type(j) == scene.LayerGeomType.LINE:
+            self.spinBox_dilation.setValue(opt[2])
+            self.spinBox_flattening.setValue(opt[3])
+            self.spinBox_elevation_diff.setValue(opt[4])
+            self.spinBox_dilation.setEnabled(True)
+            self.spinBox_flattening.setEnabled(True)
+            self.spinBox_elevation_diff.setEnabled(True)
+        elif scene.geom_type(j) == scene.LayerGeomType.POLYGON:
+            self.spinBox_dilation.setValue(opt[2])
+            self.spinBox_flattening.setValue(opt[3])
+            self.spinBox_elevation_diff.setValue(opt[4])
+            self.spinBox_dilation.setEnabled(True)
+            self.spinBox_flattening.setEnabled(True)
+            self.spinBox_elevation_diff.setEnabled(True)
+        elif scene.geom_type(j) == scene.LayerGeomType.POINT:
+            self.spinBox_dilation.setValue(opt[2])
+            self.spinBox_dilation.setEnabled(True)
+
+    def event_set_option(self, option_id, option_val):
+        layer = self.listWidget_input.currentRow()
+        if layer < 0:
+            return
+        self.current_scene.set_layer_option(layer, option_id, option_val)
+
+    def event_spinBox_z_factor(self, j):
+        self.event_set_option(0, j)
+
+    def event_spinBox_elevation_smoothing(self, j):
+        self.event_set_option(1, j)
+
+    def event_spinBox_dilation(self, j):
+        self.event_set_option(2, j)
+
+    def event_spinBox_flattening(self, j):
+        self.event_set_option(3, j)
+
+    def event_spinBox_elevation_diff(self, j):
+        self.event_set_option(4, j)
 
     def event_listwidget_input_doubleclicked(self, modelindex):
         i = self.listWidget_input.currentRow()

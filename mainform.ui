@@ -100,66 +100,71 @@
       </item>
       <item row="6" column="0">
        <layout class="QGridLayout" name="gridLayout_properties">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_id_1">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_z_factor">
           <property name="text">
-           <string>Type</string>
+           <string>Z Factor</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_uint_2">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_elevation_smoothing">
           <property name="text">
-           <string/>
+           <string>Elevation smoothing</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QSpinBox" name="spinBox_flattening">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>100</number>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QSpinBox" name="spinBox_uint_2">
+         <widget class="QSpinBox" name="spinBox_z_factor">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
           <property name="maximum">
            <number>10000</number>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_ushort_3">
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_flattening">
           <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBox_ushort_3">
-          <property name="maximum">
-           <number>100</number>
+           <string>Flattening</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_ushort_4">
+         <widget class="QLabel" name="label_dilation">
           <property name="text">
-           <string/>
+           <string>Dilation</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QSpinBox" name="spinBox_ushort_4">
+         <widget class="QSpinBox" name="spinBox_dilation">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="maximum">
            <number>100</number>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_ushort_5">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_type_">
           <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QSpinBox" name="spinBox_ushort_5">
-          <property name="maximum">
-           <number>100</number>
+           <string>Type</string>
           </property>
          </widget>
         </item>
@@ -173,6 +178,33 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="spinBox_elevation_smoothing">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_elevation_diff">
+          <property name="text">
+           <string>Elevation difference</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QSpinBox" name="spinBox_elevation_diff">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maximum">
+           <number>100</number>
           </property>
          </widget>
         </item>
@@ -322,10 +354,10 @@
   <tabstop>lineEdit_area</tabstop>
   <tabstop>listWidget_input</tabstop>
   <tabstop>pushButton_remove_layer</tabstop>
-  <tabstop>spinBox_uint_2</tabstop>
-  <tabstop>spinBox_ushort_3</tabstop>
-  <tabstop>spinBox_ushort_4</tabstop>
-  <tabstop>spinBox_ushort_5</tabstop>
+  <tabstop>spinBox_z_factor</tabstop>
+  <tabstop>spinBox_elevation_smoothing</tabstop>
+  <tabstop>spinBox_dilation</tabstop>
+  <tabstop>spinBox_flattening</tabstop>
   <tabstop>listWidget_output</tabstop>
   <tabstop>checkBox_gen_2d</tabstop>
   <tabstop>checkBox_gen_3d</tabstop>
@@ -341,8 +373,8 @@
    <slot>event_pushbutton_remove_layer_clicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
-     <y>538</y>
+     <x>209</x>
+     <y>512</y>
     </hint>
     <hint type="destinationlabel">
      <x>267</x>
@@ -510,6 +542,86 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>spinBox_z_factor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinBox_z_factor(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>574</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>561</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_elevation_smoothing</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinBox_elevation_smoothing(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>266</x>
+     <y>596</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_dilation</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinBox_dilation(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>624</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_flattening</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinBox_flattening(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>246</x>
+     <y>643</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>653</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_elevation_diff</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinBox_elevation_diff(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>260</x>
+     <y>675</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>682</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>event_pushbutton_remove_layer_clicked()</slot>
@@ -524,5 +636,10 @@
   <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
   <slot>event_lineedit_crs_textchanged(QString)</slot>
   <slot>event_listwidget_output_currentrowchanged(int)</slot>
+  <slot>event_spinBox_z_factor(int)</slot>
+  <slot>event_spinBox_elevation_smoothing(int)</slot>
+  <slot>event_spinBox_dilation(int)</slot>
+  <slot>event_spinBox_flattening(int)</slot>
+  <slot>event_spinBox_elevation_diff(int)</slot>
  </slots>
 </ui>
