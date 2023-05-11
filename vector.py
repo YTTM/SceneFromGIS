@@ -53,6 +53,24 @@ def read_line(filename, crs):
     return lines, bounds, size
 
 
+def read_point(filename, crs):
+    gis, bounds, size = read_gis(filename, crs)
+    points = []
+
+    # read all points
+    for index, poi in gis.iterrows():
+        coords = gis.loc[index, 'geometry'].coords
+        for c in range(len(coords)):
+            if len(coords[c]) == 2:
+                y0, x0 = coords[c]
+                z0 = 0
+            else:
+                y0, x0, z0 = coords[c]
+            points.append((x0, y0, z0))
+
+    return points, bounds, size
+
+
 def view_polygon(data, bounds, size):
     x_min, x_max, y_min, y_max = bounds
     x_size, y_size = size
@@ -122,6 +140,38 @@ def view_line(data, bounds, size):
     return line_map
 
 
+def view_point(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    # limit size of output for preview
+    div = 1
+    while (x_size/div) * (y_size/div) > 500 * 500:
+        div += 1
+
+    point_map = np.zeros((math.ceil(x_size/div), math.ceil(y_size/div)), dtype=np.uint8)
+
+    for point in data:
+        # read coords
+        x0, y0, z0 = point
+        # change coords to current area
+        x0 = (x0 - x_min)
+        y0 = (y0 - y_min)
+        # invert X
+        x0 = x0 * -1 + x_size
+        # preview divider
+        x0 /= div
+        y0 /= div
+        # draw point
+        x0 = round(x0)
+        y0 = round(y0)
+        if x0 < 0 or y0 < 0 or x0 >= point_map.shape[0] or y0 >= point_map.shape[1]:
+            continue
+        point_map[x0, y0] = 255
+
+    return point_map
+
+
 def build_polygon(data, bounds, size):
     x_min, x_max, y_min, y_max = bounds
     x_size, y_size = size
@@ -173,3 +223,28 @@ def build_line(data, bounds, size):
             line_map[rr, cc] = 65535
 
     return line_map
+
+
+def build_point(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    # create empty map
+    point_map = np.zeros((x_size, y_size, 1), dtype=np.uint16)
+
+    for point in data:
+        # read coords
+        x0, y0, z0 = point
+        # change coords to current area
+        x0 = (x0 - x_min)
+        y0 = (y0 - y_min)
+        # invert X
+        x0 = x0 * -1 + x_size
+        # draw point
+        x0 = round(x0)
+        y0 = round(y0)
+        if x0 < 0 or y0 < 0 or x0 >= point_map.shape[0] or y0 >= point_map.shape[1]:
+            continue
+        point_map[x0, y0] = 65535
+
+    return point_map

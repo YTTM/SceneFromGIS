@@ -80,8 +80,17 @@ class Scene:
             if layer_option is None:
                 layer_option = [None, None, 0, 0, 0]
             self.layers[-1][6] = layer_option
-        else:
-            raise NotImplementedError
+        elif layer_geom_type[layer_type] == LayerGeomType.POINT:
+            data, (bounds), (size) = vector.read_point(filename, self.crs)
+            view = vector.view_point(data, bounds, size)
+            self.layers[-1][2] = True
+            self.layers[-1][3] = bounds, size
+            if create_view:
+                self.layers[-1][4] = view
+            self.layers[-1][5] = data
+            if layer_option is None:
+                layer_option = [None, None, 0, None, None]
+            self.layers[-1][6] = layer_option
 
     def get_layer(self, i):
         return self.layers[i]
@@ -128,47 +137,46 @@ class Scene:
 
     def build(self, bounds, size):
         self.outputs = []
-
+        # HEIGHTMAP
         layers = self.get_layers_by_type(LayerType.HEIGHTMAP)
         for l in layers:
             data = raster.build(self.layers[l][5], bounds, size)
             self.outputs.append((f'HEIGHTMAP_{l:02}', data))
-
+        # LINE
         layers = self.get_layers_by_type(LayerType.PATH_LINE)
         for l in layers:
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'PATH_LINE_{l:02}', data))
-
         layers = self.get_layers_by_type(LayerType.BUILDING_LINE)
         for l in layers:
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'BUILDING_LINE_{l:02}', data))
-
         layers = self.get_layers_by_type(LayerType.FOREST_LINE)
         for l in layers:
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'FOREST_LINE_{l:02}', data))
-
         layers = self.get_layers_by_type(LayerType.WATER_LINE)
         for l in layers:
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'WATER_LINE_{l:02}', data))
-
-
+        # POLYGON
         layers = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
         for l in layers:
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'BUILDING_POLYGON_{l:02}', data))
-
         layers = self.get_layers_by_type(LayerType.FOREST_POLYGON)
         for l in layers:
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'FOREST_POLYGON_{l:02}', data))
-
         layers = self.get_layers_by_type(LayerType.WATER_POLYGON)
         for l in layers:
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'WATER_POLYGON_{l:02}', data))
+        # POINT
+        layers = self.get_layers_by_type(LayerType.FOREST_POINT)
+        for l in layers:
+            data = vector.build_point(self.layers[l][5], bounds, size)
+            self.outputs.append((f'FOREST_POINT_{l:02}', data))
 
 
 def geom_type(layer_type):
