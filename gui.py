@@ -3,6 +3,7 @@ import json
 
 import numpy as np
 from PIL import Image
+import pyvista as pv
 
 import scene
 
@@ -86,6 +87,20 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             for b in builds:
                 self.listWidget_output.addItem(str(b[0]))
 
+            # 3D view
+            self.view_3d.clear()
+            if len(self.current_scene.get_layers_by_type(scene.LayerType.HEIGHTMAP)) > 0:
+                data = builds[0][1][:, :, 0]
+                # heightmap to point list
+                points = []
+                for x in range(len(data[0])):
+                    for y in range(len(data[1])):
+                        points.append([x, y, data[x, y]])
+                cloud = pv.PolyData(np.array(points).astype(np.float32))
+                cloud['point_color'] = cloud.points[:, 2]
+                self.view_3d.add_points(cloud)
+                self.view_3d.reset_camera()
+
     def event_pushbutton_exp_clicked(self):
         foldername = QFileDialog.getExistingDirectory(self, "Export folder")
         if len(foldername) > 0:
@@ -98,7 +113,6 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 QMessageBox.critical(self,
                                      "Not a folder",
                                      f"{foldername} is not a valid folder")
-
 
     def event_listwidget_input_currentrowchanged(self, i):
         if i < 0:
