@@ -1,5 +1,6 @@
 import os
 import json
+import time
 
 import numpy as np
 from PIL import Image
@@ -23,6 +24,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
         self.setAcceptDrops(True)
         self.view_3d.set_background('E0E0E0')
+        self.view_3d.show_axes()
 
         self.current_scene = scene.Scene()
 
@@ -83,7 +85,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                  f"{area} is not a valid area")
         else:
             bounds, size = area
-            self.current_scene.build(bounds, size)
+            gen = self.current_scene.build(bounds, size, generator=True)
+            for info in gen:
+                self.log(str(info))
             builds = self.current_scene.get_builds()
             for b in builds:
                 self.listWidget_output.addItem(str(b[0]))
@@ -91,6 +95,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             # 3D view
             self.view_3d.clear()
             if len(self.current_scene.get_layers_by_type(scene.LayerType.HEIGHTMAP)) > 0:
+                t0 = time.time()
                 data = builds[0][1][:, :, 0]
                 # heightmap to point list
                 points = []
@@ -101,6 +106,8 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 cloud['point_color'] = cloud.points[:, 2]
                 self.view_3d.add_points(cloud)
                 self.view_3d.reset_camera()
+                t1 = time.time()
+                self.log(str((f'{round(t1-t0, 2)} s', f'3D VIEW',)))
 
     def event_pushbutton_exp_clicked(self):
         foldername = QFileDialog.getExistingDirectory(self, "Export folder")
@@ -250,6 +257,10 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 QMessageBox.critical(self,
                                      "Not a file",
                                      f"{f} is not a valid file")
+
+    def log(self, message):
+        print(message)
+        self.listWidget_log.addItem(message)
 
 
 class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):

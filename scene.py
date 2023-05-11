@@ -1,4 +1,5 @@
 import os
+import time
 from enum import IntEnum
 
 import raster
@@ -135,48 +136,84 @@ class Scene:
     def get_build_data(self, i):
         return self.outputs[i][1]
 
-    def build(self, bounds, size):
+    def build(self, bounds, size, generator=False):
         self.outputs = []
         # HEIGHTMAP
         layers = self.get_layers_by_type(LayerType.HEIGHTMAP)
         for l in layers:
+            t0 = time.time()
             data = raster.build(self.layers[l][5], bounds, size)
             self.outputs.append((f'HEIGHTMAP_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'HEIGHTMAP_{l:02}'
         # LINE
         layers = self.get_layers_by_type(LayerType.PATH_LINE)
         for l in layers:
+            t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'PATH_LINE_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'PATH_LINE_{l:02}',
         layers = self.get_layers_by_type(LayerType.BUILDING_LINE)
         for l in layers:
+            t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'BUILDING_LINE_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'BUILDING_LINE_{l:02}',
         layers = self.get_layers_by_type(LayerType.FOREST_LINE)
         for l in layers:
+            t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'FOREST_LINE_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'FOREST_LINE_{l:02}',
         layers = self.get_layers_by_type(LayerType.WATER_LINE)
         for l in layers:
+            t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
             self.outputs.append((f'WATER_LINE_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'WATER_LINE_{l:02}',
         # POLYGON
         layers = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
         for l in layers:
+            t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'BUILDING_POLYGON_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'BUILDING_POLYGON_{l:02}',
         layers = self.get_layers_by_type(LayerType.FOREST_POLYGON)
         for l in layers:
+            t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'FOREST_POLYGON_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'FOREST_POLYGON_{l:02}',
         layers = self.get_layers_by_type(LayerType.WATER_POLYGON)
         for l in layers:
+            t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             self.outputs.append((f'WATER_POLYGON_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'WATER_POLYGON_{l:02}',
         # POINT
         layers = self.get_layers_by_type(LayerType.FOREST_POINT)
         for l in layers:
+            t0 = time.time()
             data = vector.build_point(self.layers[l][5], bounds, size)
             self.outputs.append((f'FOREST_POINT_{l:02}', data))
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', f'FOREST_POINT_{l:02}',
 
 
 def geom_type(layer_type):
