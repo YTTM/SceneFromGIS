@@ -44,7 +44,7 @@ class Scene:
         self.outputs = []
         return
 
-    def add_layer(self, filename, layer_type, create_view=True):
+    def add_layer(self, filename, layer_type, layer_option=None, create_view=True):
         self.layers.append([filename, LayerType(layer_type), None, None, None, None, None])
 
         if layer_geom_type[layer_type] == LayerGeomType.HEIGHTMAP:
@@ -55,7 +55,9 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
-            self.layers[-1][6] = [1, 0, None, None, None]
+            if layer_option is None:
+                layer_option = [1, 0, None, None, None]
+            self.layers[-1][6] = layer_option
         elif layer_geom_type[layer_type] == LayerGeomType.POLYGON:
             data, (bounds), (size) = vector.read_polygon(filename, self.crs)
             view = vector.view_polygon(data, bounds, size)
@@ -64,7 +66,9 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
-            self.layers[-1][6] = [None, None, 0, 0, 0]
+            if layer_option is None:
+                layer_option = [None, None, 0, 0, 0]
+            self.layers[-1][6] = layer_option
         elif layer_geom_type[layer_type] == LayerGeomType.LINE:
             data, (bounds), (size) = vector.read_line(filename, self.crs)
             view = vector.view_line(data, bounds, size)
@@ -73,7 +77,9 @@ class Scene:
             if create_view:
                 self.layers[-1][4] = view
             self.layers[-1][5] = data
-            self.layers[-1][6] = [None, None, 0, 0, 0]
+            if layer_option is None:
+                layer_option = [None, None, 0, 0, 0]
+            self.layers[-1][6] = layer_option
         else:
             raise NotImplementedError
 

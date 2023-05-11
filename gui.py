@@ -26,9 +26,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
         self.current_scene = scene.Scene()
 
-    def add_layer(self, filename, type):
+    def add_layer(self, filename, type, layer_option=None):
         self.lineEdit_crs.setEnabled(False)
-        self.current_scene.add_layer(filename, type)
+        self.current_scene.add_layer(filename, type, layer_option)
 
         item = QListWidgetItem(f'{scene.layer_symbols[type]} {os.path.basename(filename)}', self.listWidget_input)
         self.listWidget_input.addItem(item)
@@ -200,10 +200,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.listWidget_output.clear()
 
     def event_action_open(self):
-        self.event_action_new()
-
         filename = QFileDialog.getOpenFileName(self, "Open file", None, "(*.json)")
         if len(filename[0]) > 0:
+            self.event_action_new()
             with open(filename[0], 'r') as outfile:
                 data = json.load(outfile)
 
@@ -215,7 +214,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             i = 0
             while str(i) in data:
                 x = data[str(i)]
-                self.add_layer(x['file'], x['type'])
+                self.add_layer(x['file'], x['type'], layer_option=x['opts'])
                 i += 1
 
     def event_action_save(self):
@@ -227,7 +226,8 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
             for i in range(len(self.current_scene.layers)):
                 data[i] = {'file': self.current_scene.get_layer_filename(i),
-                           'type': int(self.current_scene.get_layer_type(i))}
+                           'type': int(self.current_scene.get_layer_type(i)),
+                           'opts': self.current_scene.get_layer_option(i)}
 
             with open(filename[0], 'w') as outfile:
                 json.dump(data, outfile)
