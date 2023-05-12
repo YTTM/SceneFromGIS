@@ -348,6 +348,12 @@ class Scene:
         for l in layers_forest_point:
             self.outputs.append((f'FOREST_POINT_{l:02}', tmp_outputs[l]))
 
+        for l in layers_heightmap:
+            data = tmp_outputs[l]
+            data = skimage.filters.sobel(data)
+            data = ((np.clip(data, 0, 0.0005) / 0.0005) * 65535).astype(np.uint16)
+            self.outputs.append((f'HEIGHTMAP_EDGES_{l:02}', data))
+
 
 def geom_type(layer_type):
     return layer_geom_type[layer_type]
