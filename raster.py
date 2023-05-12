@@ -2,6 +2,8 @@ import math
 import numpy as np
 import rasterio
 
+import logger
+
 
 def read(filename, crs):
     gis = rasterio.open(filename)
@@ -12,7 +14,7 @@ def read(filename, crs):
     y_size = gis.width
 
     if gis.crs != crs:
-        print(f'{gis.crs} != {crs}')
+        logger.default.log(f'{"[raster][crs]":16} {gis.crs} != {crs}')
         raise AssertionError
 
     return arr, (x_min, x_max, y_min, y_max), (x_size, y_size)
@@ -36,6 +38,7 @@ def build(data, bounds, size, block_size=1, z_factor=1):
     arr = np.zeros((x_blocks * block_size, y_blocks * block_size, 1), dtype=np.uint16)
     arr[0:data.shape[0], 0:data.shape[1], 0] = data * int(z_factor)
 
-    print(f'{"output size":24}: {x_blocks * block_size} x {y_blocks * block_size} ({x_blocks} x {y_blocks})')
+    logger.default.log(f'{"[raster][out]":16} {"output size":16} : {x_blocks * block_size} x {y_blocks * block_size}')
+    logger.default.log(f'{"[raster][out]":16} {"block size":16} : {x_blocks} x {y_blocks}')
 
     return arr

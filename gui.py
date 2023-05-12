@@ -92,7 +92,8 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             bounds, size = area
             gen = self.current_scene.build(bounds, size, generator=True)
             for info in gen:
-                self.log(str(info))
+                duration, data_name = info
+                self.log(f'{"[gui   ][gen]":16} {duration:8} {data_name}')
             builds = self.current_scene.get_builds()
             for b in builds:
                 self.listWidget_output.addItem(str(b[0]))
@@ -114,7 +115,8 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 self.view_3d.add_points(cloud)
                 self.view_3d.reset_camera()
                 t1 = time.time()
-                self.log(str((f'{round(t1-t0, 2)} s', f'3D VIEW',)))
+                duration = f'{round(t1 - t0, 2)} s'
+                self.log(f'{"[gui   ][3d ]":16} {duration:8} {"3D VIEW"}')
 
     def event_pushbutton_exp_clicked(self):
         foldername = QFileDialog.getExistingDirectory(self, "Export folder")

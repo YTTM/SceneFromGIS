@@ -3,6 +3,8 @@ import numpy as np
 import geopandas
 import skimage
 
+import logger
+
 
 def read_gis(filename, crs):
     # read gis
@@ -12,7 +14,7 @@ def read_gis(filename, crs):
     x_size, y_size = math.ceil(abs(x_min - x_max)), math.ceil(abs(y_min - y_max))
 
     if gis.crs != crs:
-        print(f'{gis.crs} != {crs}')
+        logger.default.log(f'{"[vector][crs]":16} {gis.crs} != {crs}')
         raise AssertionError
 
     return gis, (x_min, x_max, y_min, y_max), (x_size, y_size)
