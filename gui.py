@@ -84,6 +84,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                  "Invalid area",
                                  f"{area} is not a valid area")
         else:
+            if not self.checkBox_gen_2d.isChecked():
+                return
+
             bounds, size = area
             gen = self.current_scene.build(bounds, size, generator=True)
             for info in gen:
@@ -94,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
 
             # 3D view
             self.view_3d.clear()
-            if len(self.current_scene.get_layers_by_type(scene.LayerType.HEIGHTMAP)) > 0:
+            if len(self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])) > 0:
                 t0 = time.time()
                 data = builds[0][1][:, :, 0]
                 # heightmap to point list
