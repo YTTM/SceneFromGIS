@@ -164,3 +164,5 @@ data/
 output/
 # Project file
 *.json
+# Logs
+SFG_logs.txt
