@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import *
 
 import mainform
 import importform
+import logger
 
 
 class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
@@ -27,6 +28,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.view_3d.show_axes()
 
         self.current_scene = scene.Scene()
+        logger.default.add_callback((self.listWidget_log.addItem, ''))
 
     def add_layer(self, filename, type, layer_option=None):
         self.lineEdit_crs.setEnabled(False)
@@ -96,6 +98,8 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 self.listWidget_output.addItem(str(b[0]))
 
             # 3D view
+            if not self.action3D_view.isChecked():
+                return
             self.view_3d.clear()
             if len(self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])) > 0:
                 t0 = time.time()
@@ -262,8 +266,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                      f"{f} is not a valid file")
 
     def log(self, message):
-        print(message)
-        self.listWidget_log.addItem(message)
+        logger.default.log(message)
+        # self.listWidget_log.addItem(message)
+        self.listWidget_log.scrollToBottom()
 
 
 class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
