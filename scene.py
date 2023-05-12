@@ -7,6 +7,7 @@ import edt
 import skimage.morphology
 import scipy.signal
 
+from morphology import auto_median
 import raster
 import vector
 
@@ -201,8 +202,8 @@ class Scene:
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'BUILDING_POLYGON_{l:02}',
-        forest_polygon = self.get_layers_by_type(LayerType.FOREST_POLYGON)
-        for l in forest_polygon:
+        layers_forest_polygon = self.get_layers_by_type(LayerType.FOREST_POLYGON)
+        for l in layers_forest_polygon:
             t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
             tmp_outputs[l] = data
@@ -245,8 +246,11 @@ class Scene:
             if generator:
                 yield f'{round(t1-t0, 2)} s', 'Z Factor'
 
+        # line, polygon and point layers
+        tmp_layers = layers_path_line + layers_building_line + layers_forest_line + layers_water_line +\
+                     layers_building_polygon + layers_forest_polygon + layers_water_polygon +\
+                     layers_forest_point
         # Dilation
-        tmp_layers = layers_path_line + layers_building_line + layers_forest_line + layers_water_line
         for l in tmp_layers:
             dilation = self.get_layer_option(l)[2]
             if dilation <= 0:
@@ -264,9 +268,47 @@ class Scene:
             if generator:
                 yield f'{round(t1-t0, 2)} s', 'Dilation'
 
+        # line and polygon layers
+        tmp_layers = layers_path_line + layers_building_line + layers_forest_line + layers_water_line +\
+                     layers_building_polygon + layers_forest_polygon + layers_water_polygon
         # Flattening
+        for l in tmp_layers:
+            flattening = self.get_layer_option(l)[3]
+            if flattening <= 0:
+                continue
+            t0 = time.time()
+            data = tmp_outputs[l]
+
+            for hmapl in layers_heightmap:
+                heightmap = tmp_outputs[hmapl]
+                alternative_height = auto_median(heightmap[:, :, 0], skimage.morphology.disk(flattening))
+                alternative_height = np.expand_dims(alternative_height.astype(np.uint16), -1)
+                tmp_outputs[hmapl] = np.where(data == 0, heightmap, alternative_height)
+
+            tmp_outputs[l] = data
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', 'Flattening'
 
         # Elevation difference
+        for l in tmp_layers:
+            difference = self.get_layer_option(l)[4]
+            if difference == 0:
+                continue
+            t0 = time.time()
+            data = tmp_outputs[l]
+
+            for hmapl in layers_heightmap:
+                z_factor = self.get_layer_option(hmapl)[0]
+                z_factor = max(z_factor, 1)
+                heightmap = tmp_outputs[hmapl]
+                heightmap += ((data.astype(np.float32) / 65535) * z_factor * difference).astype(np.uint16)
+                tmp_outputs[hmapl] = heightmap
+
+            tmp_outputs[l] = data
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', 'Elevation difference'
 
         # Elevation smoothing
         for l in layers_heightmap:
@@ -299,7 +341,7 @@ class Scene:
             self.outputs.append((f'WATER_LINE_{l:02}', tmp_outputs[l]))
         for l in layers_building_polygon:
             self.outputs.append((f'BUILDING_POLYGON_{l:02}', tmp_outputs[l]))
-        for l in layers_forest_line:
+        for l in layers_forest_polygon:
             self.outputs.append((f'FOREST_POLYGON_{l:02}', tmp_outputs[l]))
         for l in layers_water_polygon:
             self.outputs.append((f'WATER_POLYGON_{l:02}', tmp_outputs[l]))
