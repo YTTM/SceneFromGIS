@@ -1,5 +1,6 @@
 import os
 import time
+import hashlib
 from enum import IntEnum
 
 import numpy as np
@@ -46,11 +47,13 @@ layer_names_ = [str(s).upper().replace(' ', '_').replace('(', '').replace(')', '
 
 
 class Scene:
-    def __init__(self, crs='EPSG:2154'):
+    def __init__(self, crs='EPSG:2154', enable_build_cache=True):
         # layer format : [filename, type, valid, info, view, data, option]
         self.layers = []
         self.crs = crs
         self.outputs = []
+        self.enable_build_cache = enable_build_cache
+        self.build_cache = {}
         return
 
     def last_layer_setup(self, valid=False, info=None, view=None, data=None, option=None):
@@ -215,7 +218,19 @@ class Scene:
         for l_type in LayerType:
             layers = self.get_layers_by_types([l_type])
             for l in layers:
-                data, info = self.build_layer_initial(l, bounds, size)
+                if self.enable_build_cache:
+                    # filename, info, data
+                    k_ = str(self.layers[l][0]) + str(self.layers[l][3]) + str(self.layers[l][5])
+                    k = hashlib.sha1(k_.encode()).hexdigest()
+                    if k in self.build_cache:
+                        data, info = self.build_cache[k]
+                        info = ('CACHE', info[1])
+                    else:
+                        self.build_cache[k] = self.build_layer_initial(l, bounds, size)
+                        data, info = self.build_cache[k]
+                else:
+                    data, info = self.build_layer_initial(l, bounds, size)
+
                 tmp_outputs[l] = data
                 if generator:
                     yield info
