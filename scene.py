@@ -348,11 +348,32 @@ class Scene:
         for l in layers_forest_point:
             self.outputs.append((f'FOREST_POINT_{l:02}', tmp_outputs[l]))
 
+        # Heightmap edges
         for l in layers_heightmap:
             data = tmp_outputs[l]
             data = skimage.filters.sobel(data)
             data = ((np.clip(data, 0, 0.0005) / 0.0005) * 65535).astype(np.uint16)
             self.outputs.append((f'HEIGHTMAP_EDGES_{l:02}', data))
+
+        # Remove forest from non forest layers
+        non_forest_layers = layers_path_line + layers_building_line + layers_water_line + layers_building_polygon + layers_water_polygon
+        forest_layers = layers_forest_line + layers_forest_polygon + layers_forest_point
+        for l in forest_layers:
+            data = tmp_outputs[l]
+            for l_neg in non_forest_layers:
+                data = np.logical_and(data > 0, tmp_outputs[l_neg] <= 0)
+            data = skimage.morphology.binary_erosion(data[:, :, 0], footprint=skimage.morphology.disk(2))
+            data = (np.expand_dims(data, -1).astype(np.uint16) * 65535)
+            tmp_outputs[l] = data
+        for l in forest_layers:
+            self.outputs.append((f'FOREST_CLEAN_{l:02}', tmp_outputs[l]))
+
+        # Grass : negative of all non forest layers
+        data = np.zeros((size[0], size[1], 1), dtype=np.uint16)
+        for layer in non_forest_layers:
+            data = np.logical_or(data, tmp_outputs[layer] > 0)
+        data = (1 - data.astype(np.uint16))*65535
+        self.outputs.append((f'GRASS', data))
 
 
 def geom_type(layer_type):
