@@ -174,6 +174,39 @@ class Scene:
         t1 = time.time()
         return data, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Dilation')
 
+    def build_postprocess_flattening(self, layer, data_vector, data_map, flattening):
+        t0 = time.time()
+
+        alternative_height = auto_median(data_map[:, :, 0], skimage.morphology.disk(flattening))
+        alternative_height = np.expand_dims(alternative_height.astype(np.uint16), -1)
+        data_map = np.where(data_vector == 0, data_map, alternative_height)
+
+        t1 = time.time()
+        return data_map, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Flattening')
+
+    def build_postprocess_elevation_difference(self, layer, data_vector, data_map, difference, ):
+        t0 = time.time()
+
+        z_factor = self.get_layer_option(layer)[0]
+        z_factor = max(z_factor, 1)
+
+        heightmap = data_map
+        data_map += ((data_vector.astype(np.float32) / 65535) * z_factor * difference).astype(np.uint16)
+
+        t1 = time.time()
+        return data_map, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Elevation Difference')
+
+    def build_postprocess_elevation_smoothing(self, layer, data, elevation_smoothing):
+        t0 = time.time()
+
+        kernel = skimage.morphology.disk(elevation_smoothing).astype(np.float64)
+        kernel /= np.sum(kernel)
+        data = scipy.signal.convolve2d(data[:, :, 0], kernel, mode='same', boundary='symm')
+        data = np.expand_dims(data.astype(np.uint16), -1)
+
+        t1 = time.time()
+        return data, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Elevation Smoothing')
+
     def build(self, bounds, size, generator=False):
         self.outputs = []
         tmp_outputs = {}
@@ -222,57 +255,29 @@ class Scene:
             flattening = self.get_layer_option(l)[3]
             if flattening <= 0:
                 continue
-
-            t0 = time.time()
-            data = tmp_outputs[l]
-
             for hmapl in layers_heightmap:
-                heightmap = tmp_outputs[hmapl]
-                alternative_height = auto_median(heightmap[:, :, 0], skimage.morphology.disk(flattening))
-                alternative_height = np.expand_dims(alternative_height.astype(np.uint16), -1)
-                tmp_outputs[hmapl] = np.where(data == 0, heightmap, alternative_height)
-
-            t1 = time.time()
-            if generator:
-                yield f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(l)])}_{l:02} Flattening'
+                tmp_outputs[hmapl], info = self.build_postprocess_flattening(l, tmp_outputs[l], tmp_outputs[hmapl], flattening)
+                if generator:
+                    yield info
 
         # Elevation difference
         for l in layers_vectors_:
             difference = self.get_layer_option(l)[4]
             if difference == 0:
                 continue
-
-            t0 = time.time()
-            data = tmp_outputs[l]
-
             for hmapl in layers_heightmap:
-                z_factor = self.get_layer_option(hmapl)[0]
-                z_factor = max(z_factor, 1)
-                heightmap = tmp_outputs[hmapl]
-                heightmap += ((data.astype(np.float32) / 65535) * z_factor * difference).astype(np.uint16)
-                tmp_outputs[hmapl] = heightmap
-
-            t1 = time.time()
-            if generator:
-                yield f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(l)])}_{l:02} Elevation Difference'
+                tmp_outputs[hmapl], info = self.build_postprocess_elevation_difference(hmapl, tmp_outputs[l], tmp_outputs[hmapl], difference)
+                if generator:
+                    yield info
 
         # Elevation smoothing
         for l in layers_heightmap:
             elevation_smoothing = self.get_layer_option(l)[1]
             if elevation_smoothing <= 0:
                 continue
-            t0 = time.time()
-            data = tmp_outputs[l]
-
-            kernel = skimage.morphology.disk(elevation_smoothing).astype(np.float64)
-            kernel /= np.sum(kernel)
-            data = scipy.signal.convolve2d(data[:, :, 0], kernel, mode='same', boundary='symm')
-            data = np.expand_dims(data.astype(np.uint16), -1)
-
-            tmp_outputs[l] = data
-            t1 = time.time()
+            tmp_outputs[l], info = self.build_postprocess_elevation_smoothing(l, tmp_outputs[l], elevation_smoothing)
             if generator:
-                yield f'{round(t1-t0, 2)} s', 'Elevation smoothing', f'HEIGHTMAP_{l:02}'
+                yield info
 
         # Output
         for type in LayerType:
