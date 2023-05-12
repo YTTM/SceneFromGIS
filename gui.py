@@ -101,7 +101,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 points = []
                 for x in range(len(data[0])):
                     for y in range(len(data[1])):
-                        points.append([x, y, data[x, y]])
+                        points.append([y, -x, data[x, y]])
                 cloud = pv.PolyData(np.array(points).astype(np.float32))
                 cloud['point_color'] = cloud.points[:, 2]
                 self.view_3d.add_points(cloud)
