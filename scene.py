@@ -2,6 +2,11 @@ import os
 import time
 from enum import IntEnum
 
+import numpy as np
+import edt
+import skimage.morphology
+import scipy.signal
+
 import raster
 import vector
 
@@ -138,82 +143,168 @@ class Scene:
 
     def build(self, bounds, size, generator=False):
         self.outputs = []
+        tmp_outputs = {}
+        # Map build
         # HEIGHTMAP
-        layers = self.get_layers_by_type(LayerType.HEIGHTMAP)
-        for l in layers:
+        layers_heightmap = self.get_layers_by_type(LayerType.HEIGHTMAP)
+        for l in layers_heightmap:
             t0 = time.time()
             data = raster.build(self.layers[l][5], bounds, size)
-            self.outputs.append((f'HEIGHTMAP_{l:02}', data))
+            tmp_outputs[l] = data
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'HEIGHTMAP_{l:02}'
         # LINE
-        layers = self.get_layers_by_type(LayerType.PATH_LINE)
-        for l in layers:
+        layers_path_line = self.get_layers_by_type(LayerType.PATH_LINE)
+        for l in layers_path_line:
             t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
-            self.outputs.append((f'PATH_LINE_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'PATH_LINE_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'PATH_LINE_{l:02}',
-        layers = self.get_layers_by_type(LayerType.BUILDING_LINE)
-        for l in layers:
+        layers_building_line = self.get_layers_by_type(LayerType.BUILDING_LINE)
+        for l in layers_building_line:
             t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
-            self.outputs.append((f'BUILDING_LINE_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'BUILDING_LINE_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'BUILDING_LINE_{l:02}',
-        layers = self.get_layers_by_type(LayerType.FOREST_LINE)
-        for l in layers:
+        layers_forest_line = self.get_layers_by_type(LayerType.FOREST_LINE)
+        for l in layers_forest_line:
             t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
-            self.outputs.append((f'FOREST_LINE_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'FOREST_LINE_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'FOREST_LINE_{l:02}',
-        layers = self.get_layers_by_type(LayerType.WATER_LINE)
-        for l in layers:
+        layers_water_line = self.get_layers_by_type(LayerType.WATER_LINE)
+        for l in layers_water_line:
             t0 = time.time()
             data = vector.build_line(self.layers[l][5], bounds, size)
-            self.outputs.append((f'WATER_LINE_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'WATER_LINE_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'WATER_LINE_{l:02}',
         # POLYGON
-        layers = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
-        for l in layers:
+        layers_building_polygon = self.get_layers_by_type(LayerType.BUILDING_POLYGON)
+        for l in layers_building_polygon:
             t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
-            self.outputs.append((f'BUILDING_POLYGON_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'BUILDING_POLYGON_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'BUILDING_POLYGON_{l:02}',
-        layers = self.get_layers_by_type(LayerType.FOREST_POLYGON)
-        for l in layers:
+        forest_polygon = self.get_layers_by_type(LayerType.FOREST_POLYGON)
+        for l in forest_polygon:
             t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
-            self.outputs.append((f'FOREST_POLYGON_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'FOREST_POLYGON_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'FOREST_POLYGON_{l:02}',
-        layers = self.get_layers_by_type(LayerType.WATER_POLYGON)
-        for l in layers:
+        layers_water_polygon = self.get_layers_by_type(LayerType.WATER_POLYGON)
+        for l in layers_water_polygon:
             t0 = time.time()
             data = vector.build_polygon(self.layers[l][5], bounds, size)
-            self.outputs.append((f'WATER_POLYGON_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'WATER_POLYGON_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'WATER_POLYGON_{l:02}',
         # POINT
-        layers = self.get_layers_by_type(LayerType.FOREST_POINT)
-        for l in layers:
+        layers_forest_point = self.get_layers_by_type(LayerType.FOREST_POINT)
+        for l in layers_forest_point:
             t0 = time.time()
             data = vector.build_point(self.layers[l][5], bounds, size)
-            self.outputs.append((f'FOREST_POINT_{l:02}', data))
+            tmp_outputs[l] = data
+            # self.outputs.append((f'FOREST_POINT_{l:02}', data))
             t1 = time.time()
             if generator:
                 yield f'{round(t1-t0, 2)} s', f'FOREST_POINT_{l:02}',
+
+        # Post process
+        # Z Factor
+        for l in layers_heightmap:
+            z_factor = self.get_layer_option(l)[0]
+            z_factor = max(z_factor, 1)
+            t0 = time.time()
+            data = tmp_outputs[l]
+
+            data = data * z_factor
+
+            tmp_outputs[l] = data
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', 'Z Factor'
+
+        # Dilation
+        tmp_layers = layers_path_line + layers_building_line + layers_forest_line + layers_water_line
+        for l in tmp_layers:
+            dilation = self.get_layer_option(l)[2]
+            if dilation <= 0:
+                continue
+            t0 = time.time()
+            data = tmp_outputs[l]
+
+            data = skimage.morphology.binary_dilation(data[:, :, 0],
+                                                      footprint=skimage.morphology.disk(dilation))
+            data = np.clip(edt.edt(data), 0, dilation).astype(np.float32) / dilation
+            data = (np.expand_dims(data, -1) * 65535).astype(np.uint16)
+
+            tmp_outputs[l] = data
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', 'Dilation'
+
+        # Flattening
+
+        # Elevation difference
+
+        # Elevation smoothing
+        for l in layers_heightmap:
+            elevation_smoothing = self.get_layer_option(l)[1]
+            if elevation_smoothing <= 0:
+                continue
+            t0 = time.time()
+            data = tmp_outputs[l]
+
+            kernel = skimage.morphology.disk(elevation_smoothing).astype(np.float64)
+            kernel /= np.sum(kernel)
+            data = scipy.signal.convolve2d(data[:, :, 0], kernel, mode='same', boundary='symm')
+            data = np.expand_dims(data.astype(np.uint16), -1)
+
+            tmp_outputs[l] = data
+            t1 = time.time()
+            if generator:
+                yield f'{round(t1-t0, 2)} s', 'Elevation smoothing', f'HEIGHTMAP_{l:02}'
+
+        # Output
+        for l in layers_heightmap:
+            self.outputs.append((f'HEIGHTMAP_{l:02}', tmp_outputs[l]))
+        for l in layers_path_line:
+            self.outputs.append((f'PATH_LINE_{l:02}', tmp_outputs[l]))
+        for l in layers_building_line:
+            self.outputs.append((f'BUILDING_LINE_{l:02}', tmp_outputs[l]))
+        for l in layers_forest_line:
+            self.outputs.append((f'FOREST_LINE_{l:02}', tmp_outputs[l]))
+        for l in layers_water_line:
+            self.outputs.append((f'WATER_LINE_{l:02}', tmp_outputs[l]))
+        for l in layers_building_polygon:
+            self.outputs.append((f'BUILDING_POLYGON_{l:02}', tmp_outputs[l]))
+        for l in layers_forest_line:
+            self.outputs.append((f'FOREST_POLYGON_{l:02}', tmp_outputs[l]))
+        for l in layers_water_polygon:
+            self.outputs.append((f'WATER_POLYGON_{l:02}', tmp_outputs[l]))
+        for l in layers_forest_point:
+            self.outputs.append((f'FOREST_POINT_{l:02}', tmp_outputs[l]))
 
 
 def geom_type(layer_type):
