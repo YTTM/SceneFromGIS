@@ -178,8 +178,11 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="minimum">
+           <number>-1000</number>
+          </property>
           <property name="maximum">
-           <number>100</number>
+           <number>1000</number>
           </property>
          </widget>
         </item>
