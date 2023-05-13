@@ -22,7 +22,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
+        self.setWindowIcon(QtGui.QIcon(':/icons/SfGicon.png'))
         self.setAcceptDrops(True)
         self.view_3d.set_background('E0E0E0')
         self.view_3d.show_axes()
@@ -277,7 +277,7 @@ class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):
     def __init__(self):
         super(DialogImport, self).__init__()
         self.setupUi(self)
-        self.setWindowIcon(QtGui.QIcon('SfGicon.png'))
+        self.setWindowIcon(QtGui.QIcon(':/icons/SfGicon.png'))
         for l in range(len(scene.layer_names)):
             self.comboBox_layer_type.addItem(f'{scene.layer_symbols[l]} {scene.layer_names[l]}')
 
