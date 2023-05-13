@@ -272,3 +272,4 @@ class Ui_MainWindow(object):
         self.actionClear_log.setText(_translate("MainWindow", "Clear log"))
         self.action3D_view.setText(_translate("MainWindow", "3D view"))
 from pyvistaqt import QtInteractor
+import resources_rc

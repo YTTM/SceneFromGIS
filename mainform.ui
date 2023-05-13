@@ -413,7 +413,9 @@
   <tabstop>pushButton_gen</tabstop>
   <tabstop>pushButton_exp</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pushButton_remove_layer</sender>
