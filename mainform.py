@@ -191,6 +191,8 @@ class Ui_MainWindow(object):
         self.action3D_view.setCheckable(True)
         self.action3D_view.setChecked(True)
         self.action3D_view.setObjectName("action3D_view")
+        self.actionReset_3D_camera = QtWidgets.QAction(MainWindow)
+        self.actionReset_3D_camera.setObjectName("actionReset_3D_camera")
         self.menuProject.addAction(self.actionNew)
         self.menuProject.addAction(self.actionOpen)
         self.menuProject.addAction(self.actionSave)
@@ -198,6 +200,7 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.actionShow_log)
         self.menuView.addAction(self.actionClear_log)
         self.menuView.addAction(self.action3D_view)
+        self.menuView.addAction(self.actionReset_3D_camera)
         self.menubar.addAction(self.menuProject.menuAction())
         self.menubar.addAction(self.menuLayer.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -223,6 +226,7 @@ class Ui_MainWindow(object):
         self.actionClear_log.triggered.connect(self.listWidget_log.clear) # type: ignore
         self.action3D_view.toggled['bool'].connect(self.view_3d.setVisible) # type: ignore
         self.action3D_view.triggered.connect(MainWindow.repaint) # type: ignore
+        self.actionReset_3D_camera.triggered.connect(MainWindow.event_reset_3d_camera) # type: ignore
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.lineEdit_crs, self.lineEdit_area)
         MainWindow.setTabOrder(self.lineEdit_area, self.listWidget_input)
@@ -271,5 +275,6 @@ class Ui_MainWindow(object):
         self.actionShow_log.setText(_translate("MainWindow", "Show log"))
         self.actionClear_log.setText(_translate("MainWindow", "Clear log"))
         self.action3D_view.setText(_translate("MainWindow", "3D view"))
+        self.actionReset_3D_camera.setText(_translate("MainWindow", "Reset 3D camera"))
 from pyvistaqt import QtInteractor
 import resources_rc

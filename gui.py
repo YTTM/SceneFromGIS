@@ -251,6 +251,9 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_action_add(self):
         self.add_layer_dialog("")
 
+    def event_reset_3d_camera(self):
+        self.view_3d.reset_camera()
+
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.accept()

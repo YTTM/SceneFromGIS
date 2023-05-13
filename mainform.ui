@@ -324,6 +324,7 @@
     <addaction name="actionShow_log"/>
     <addaction name="actionClear_log"/>
     <addaction name="action3D_view"/>
+    <addaction name="actionReset_3D_camera"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuLayer"/>
@@ -387,6 +388,11 @@
    </property>
    <property name="text">
     <string>3D view</string>
+   </property>
+  </action>
+  <action name="actionReset_3D_camera">
+   <property name="text">
+    <string>Reset 3D camera</string>
    </property>
   </action>
  </widget>
@@ -737,6 +743,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionReset_3D_camera</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_reset_3d_camera()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>639</x>
+     <y>359</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>event_pushbutton_remove_layer_clicked()</slot>
@@ -756,5 +778,6 @@
   <slot>event_spinBox_dilation(int)</slot>
   <slot>event_spinBox_flattening(int)</slot>
   <slot>event_spinBox_elevation_diff(int)</slot>
+  <slot>event_reset_3d_camera()</slot>
  </slots>
 </ui>
