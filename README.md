@@ -41,7 +41,7 @@ To create maps for games, you will need to go through the following steps :
 1. [Get geographic data](#get-geographic-data)
 2. [Prepare geographic data](#prepare-geographic-data)
 3. [Convert geographic data using SceneFromGIS](#convert-geographic-data-using-SceneFromGIS)
-4. [Import scene data to game editor](#import-scene-data-to-game-editor])
+4. [Import scene data to game editor](#import-scene-data-to-game-editor)
 
 #### Get geographic data
 todo
