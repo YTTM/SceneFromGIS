@@ -35,5 +35,6 @@ def build(data, bounds, size, z_factor=1):
 
     arr = np.zeros((x_size, y_size, 1), dtype=np.uint16)
     arr[0:data.shape[0], 0:data.shape[1], 0] = data * float(z_factor)
+    arr += 100 * z_factor
 
     return arr
