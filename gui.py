@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 import pyvista as pv
 
+import utils
 import scene
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -94,47 +95,48 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_pushbutton_gen_clicked(self):
         self.listWidget_output.clear()
 
-        hmap_id = self.comboBox_heightmap.currentIndex()
-        if hmap_id < 0:
-            QMessageBox.critical(self,
-                                 "No selected heightmap",
-                                 f"No selected heightmap")
+        heightmap_n = self.comboBox_heightmap.currentIndex()
+        if heightmap_n < 0:
+            self.log("No selected heightmap", critical=True)
             return
-        else:
-            if not self.checkBox_gen_2d.isChecked():
-                return
-            # todo: self.spinBox_block_size
-            hmap_layers = self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])
-            hmap = hmap_layers[hmap_id]
+        heightmap_id = self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])[heightmap_n]
 
-            bounds, size = self.current_scene.get_layer_info(hmap)
-            gen = self.current_scene.build(bounds, size, generator=True)
-            for info in gen:
-                duration, data_name = info
-                self.log(f'{"[gui   ][gen]":16} {duration:8} {data_name}')
-            builds = self.current_scene.get_builds()
-            for b in builds:
-                self.listWidget_output.addItem(str(b[0]))
+        if not self.checkBox_gen_2d.isChecked():
+            self.log("Generate 2D maps is unchecked. Nothing to build !")
+            return
 
-            # 3D view
-            if not self.action3D_view.isChecked():
-                return
-            self.view_3d.clear()
-            if len(self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])) > 0:
-                t0 = time.time()
-                data = builds[0][1][:, :, 0]
-                # heightmap to point list
-                points = []
-                for x in range(len(data[0])):
-                    for y in range(len(data[1])):
-                        points.append([y, -x, data[x, y]])
-                cloud = pv.PolyData(np.array(points).astype(np.float32))
-                cloud['point_color'] = cloud.points[:, 2]
-                self.view_3d.add_points(cloud)
-                self.view_3d.reset_camera()
-                t1 = time.time()
-                duration = f'{round(t1 - t0, 2)} s'
-                self.log(f'{"[gui   ][3d ]":16} {duration:8} {"3D VIEW"}')
+        block_size = max(1, int(self.spinBox_block_size.value()))
+        # generator is used to provide update of the building process
+        gen = self.current_scene.build(heightmap_id, block_size, generator=True)
+        for info in gen:
+            duration, data_name = info
+            self.log(f'{"[gui   ][gen]":16} {duration:8} {data_name}')
+
+        # update output list
+        builds = self.current_scene.get_builds()
+        for b in builds:
+            self.listWidget_output.addItem(str(b[0]))
+
+        # 3D view
+        if not self.action3D_view.isChecked():
+            return
+        data = self.current_scene.get_build_data(heightmap_n)[:, :, 0]
+        self.update_view_3d(data)
+
+    def update_view_3d(self, data):
+        t0 = time.time()
+
+        points = utils.heightmap_to_point_list(data)
+        cloud = pv.PolyData(np.array(points).astype(np.float32))
+        cloud['point_color'] = cloud.points[:, 2]
+
+        self.view_3d.clear()
+        self.view_3d.add_points(cloud)
+        self.view_3d.reset_camera()
+
+        t1 = time.time()
+        duration = f'{round(t1 - t0, 2)} s'
+        self.log(f'{"[gui   ][3d ]":16} {duration:8} {"3D VIEW"}')
 
     def event_pushbutton_exp_clicked(self):
         foldername = QFileDialog.getExistingDirectory(self, "Export folder")
@@ -290,10 +292,14 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                      "Not a file",
                                      f"{f} is not a valid file")
 
-    def log(self, message):
+    def log(self, message, critical=False):
         logger.default.log(message)
         # self.listWidget_log.addItem(message)
         self.listWidget_log.scrollToBottom()
+        if critical:
+            QMessageBox.critical(self,
+                                 "Error",
+                                 message)
 
 
 class DialogImport(QtWidgets.QDialog, importform.Ui_Dialog):

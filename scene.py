@@ -144,6 +144,7 @@ class Scene:
 
         # check layer type to handle result
         if geom_type(layer_type) == LayerGeomType.HEIGHTMAP:
+            bounds, size = self.get_layer_info(layer)
             data = raster.build(self.get_layer_data(layer), bounds, size)
         elif geom_type(layer_type) == LayerGeomType.LINE:
             data = vector.build_line(self.get_layer_data(layer), bounds, size)
@@ -210,9 +211,12 @@ class Scene:
         t1 = time.time()
         return data, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Elevation Smoothing')
 
-    def build(self, bounds, size, generator=False):
+    def build(self, heightmap_id, block_size, generator=False):
+        # todo : block_size
         self.outputs = []
         tmp_outputs = {}
+
+        bounds, size = self.get_layer_info(heightmap_id)
 
         # Map initial build
         for l_type in LayerType:
@@ -220,7 +224,7 @@ class Scene:
             for l in layers:
                 if self.enable_build_cache:
                     # filename, info, data
-                    k_ = str(self.layers[l][0]) + str(self.layers[l][3]) + str(self.layers[l][5])
+                    k_ = str(self.layers[l][0]) + str(self.layers[l][3]) + str(self.layers[l][5]) + str(bounds) + str(size)
                     k = hashlib.sha1(k_.encode()).hexdigest()
                     if k in self.build_cache:
                         data, info = self.build_cache[k]
@@ -270,20 +274,18 @@ class Scene:
             flattening = self.get_layer_option(l)[3]
             if flattening <= 0:
                 continue
-            for hmapl in layers_heightmap:
-                tmp_outputs[hmapl], info = self.build_postprocess_flattening(l, tmp_outputs[l], tmp_outputs[hmapl], flattening)
-                if generator:
-                    yield info
+            tmp_outputs[heightmap_id], info = self.build_postprocess_flattening(l, tmp_outputs[l], tmp_outputs[heightmap_id], flattening)
+            if generator:
+                yield info
 
         # Elevation difference
         for l in layers_vectors_:
             difference = self.get_layer_option(l)[4]
             if difference == 0:
                 continue
-            for hmapl in layers_heightmap:
-                tmp_outputs[hmapl], info = self.build_postprocess_elevation_difference(hmapl, tmp_outputs[l], tmp_outputs[hmapl], difference)
-                if generator:
-                    yield info
+            tmp_outputs[heightmap_id], info = self.build_postprocess_elevation_difference(heightmap_id, tmp_outputs[l], tmp_outputs[heightmap_id], difference)
+            if generator:
+                yield info
 
         # Elevation smoothing
         for l in layers_heightmap:
@@ -301,11 +303,10 @@ class Scene:
                 self.outputs.append((f'{str(layer_names_[self.get_layer_type(l)])}_{l:02}', tmp_outputs[l]))
 
         # Heightmap edges
-        for l in layers_heightmap:
-            data = tmp_outputs[l]
-            data = skimage.filters.sobel(data)
-            data = ((np.clip(data, 0, 0.0005) / 0.0005) * 65535).astype(np.uint16)
-            self.outputs.append((f'HEIGHTMAP_EDGES_{l:02}', data))
+        data = tmp_outputs[heightmap_id]
+        data = skimage.filters.sobel(data)
+        data = ((np.clip(data, 0, 0.0005) / 0.0005) * 65535).astype(np.uint16)
+        self.outputs.append((f'HEIGHTMAP_EDGES_{heightmap_id:02}', data))
 
         # Remove forest from non forest layers
         for l in layers_forest:
