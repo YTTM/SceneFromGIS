@@ -54,6 +54,7 @@ class Scene:
         self.layers = []
         self.crs = crs
         self.outputs = []
+        self.outputs_path = []
         self.enable_build_cache = enable_build_cache
         self.build_cache = {}
         return
@@ -218,6 +219,7 @@ class Scene:
 
     def build(self, heightmap_id, block_size, generator=False):
         self.outputs = []
+        self.outputs_path = []
         tmp_outputs = {}
 
         # block size
@@ -341,6 +343,16 @@ class Scene:
             data = np.logical_or(data, tmp_outputs[layer] > 0)
         data = (1 - data.astype(np.uint16))*65535
         self.outputs.append((f'GRASS', data))
+
+        # Build Paths
+        for layer in self.get_layers_by_types([LayerType.PATH_LINE, LayerType.WATER_LINE]):
+            t0 = time.time()
+            paths, paths_dir = vector.build_line_path(self.get_layer_data(layer), bounds, size)
+            self.outputs_path.append((paths, paths_dir))
+            t1 = time.time()
+
+            if generator:
+                yield f'{round(t1 - t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} PATH'
 
         # Restore original info
         self.set_layer_info(heightmap_id, original_heightmap_info)
