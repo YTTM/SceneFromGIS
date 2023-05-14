@@ -1,6 +1,7 @@
 import os
 import time
 import hashlib
+import math
 from enum import IntEnum
 
 import numpy as np
@@ -8,6 +9,7 @@ import edt
 import skimage.morphology
 import scipy.signal
 
+import logger
 from morphology import auto_median
 import raster
 import vector
@@ -110,6 +112,9 @@ class Scene:
     def get_layer_info(self, i):
         return self.layers[i][3]
 
+    def set_layer_info(self, i, info):
+        self.layers[i][3] = info
+
     def get_layer_view(self, i):
         return self.layers[i][4]
 
@@ -145,7 +150,7 @@ class Scene:
         # check layer type to handle result
         if geom_type(layer_type) == LayerGeomType.HEIGHTMAP:
             bounds, size = self.get_layer_info(layer)
-            data = raster.build(self.get_layer_data(layer), bounds, size)
+            data = raster.build(np.copy(self.get_layer_data(layer)), bounds, size)
         elif geom_type(layer_type) == LayerGeomType.LINE:
             data = vector.build_line(self.get_layer_data(layer), bounds, size)
         elif geom_type(layer_type) == LayerGeomType.POLYGON:
@@ -212,11 +217,22 @@ class Scene:
         return data, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Elevation Smoothing')
 
     def build(self, heightmap_id, block_size, generator=False):
-        # todo : block_size
         self.outputs = []
         tmp_outputs = {}
 
+        # block size
         bounds, size = self.get_layer_info(heightmap_id)
+        original_heightmap_info = bounds, size
+        x_size, y_size = size
+        x_blocks = math.ceil(x_size / block_size)
+        y_blocks = math.ceil(y_size / block_size)
+        x_diff = x_blocks * block_size - x_size
+        y_diff = y_blocks * block_size - y_size
+        size = (x_blocks * block_size, y_blocks * block_size)
+        self.set_layer_info(heightmap_id, (bounds, size))
+
+        logger.default.log(f'{"[scene ][build]":16} {"blocks":16} : {x_blocks} x {y_blocks}')
+        logger.default.log(f'{"[scene ][build]":16} {"output size":16} : {x_blocks * block_size} x {y_blocks * block_size}')
 
         # Map initial build
         for l_type in LayerType:
@@ -325,6 +341,9 @@ class Scene:
             data = np.logical_or(data, tmp_outputs[layer] > 0)
         data = (1 - data.astype(np.uint16))*65535
         self.outputs.append((f'GRASS', data))
+
+        # Restore original info
+        self.set_layer_info(heightmap_id, original_heightmap_info)
 
 
 def geom_type(layer_type):
