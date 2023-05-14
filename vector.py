@@ -250,3 +250,50 @@ def build_point(data, bounds, size):
         point_map[x0, y0] = 65535
 
     return point_map
+
+
+def build_line_path(data, bounds, size):
+    x_min, x_max, y_min, y_max = bounds
+    x_size, y_size = size
+
+    paths = []
+    paths_dir = []
+
+    # path point
+    for line in data:
+        path = []
+        for c in range(len(line)):
+            # read coords
+            x0, y0, z0 = line[c]
+            # change coords to current area
+            x0 = (x0 - x_min)
+            y0 = (y0 - y_min)
+            # invert X
+            x0 = x0 * -1 + x_size
+            # x0 += x_diff
+            # ignore output points
+            if x0 < 0 or x0 > x_size or y0 < 0 or y0 > y_size:
+                continue
+            path.append((y0, x0, z0))
+        if len(path) < 2:
+            continue
+        paths.append(path)
+
+    # path directional vector
+    for path in paths:
+        path_dir = []
+        for p_ in range(len(path)):
+            p0 = np.array(path[p_])
+            if p_ == 0:
+                d1 = np.array(path[p_+1] - p0) / 2
+                d2 = -d1
+            elif p_ == len(path) - 1:
+                d2 = np.array(p0 - path[p_-1]) / 2
+                d1 = -d2
+            else:
+                d1 = np.array(path[p_+1] - p0) / 2
+                d2 = np.array(p0 - path[p_-1]) / 2
+            path_dir.append((d1, d2))
+        paths_dir.append(path_dir)
+
+    return paths, paths_dir
