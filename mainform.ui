@@ -15,49 +15,63 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="3" rowspan="2">
-     <layout class="QGridLayout" name="gridLayout_right">
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="checkBox_gen_2d">
-        <property name="text">
-         <string>Generate 2D maps</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="checkBox_gen_3d">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Generate 3D obj</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QListWidget" name="listWidget_output"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="pushButton_gen">
-        <property name="text">
-         <string>Generate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="pushButton_exp">
-        <property name="text">
-         <string>Export</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="0" column="0" rowspan="2">
      <layout class="QGridLayout" name="gridLayout_left">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_project">
+        <property name="text">
+         <string>Project</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <layout class="QGridLayout" name="gridLayout_project_setup">
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="spinBox_block_size">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>1024</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEdit_crs">
+          <property name="text">
+           <string>EPSG:2154</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_block_size">
+          <property name="text">
+           <string>Block size</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_heightmap">
+          <property name="text">
+           <string>Heightmap</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_crs">
+          <property name="text">
+           <string>CRS</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="comboBox_heightmap"/>
+        </item>
+       </layout>
+      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_layers">
         <property name="text">
@@ -68,6 +82,16 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0">
+       <widget class="QListWidget" name="listWidget_input"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="pushButton_remove_layer">
+        <property name="text">
+         <string>Remove layer</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0">
        <widget class="QLabel" name="label_layer_properties">
         <property name="text">
@@ -75,13 +99,6 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="pushButton_remove_layer">
-        <property name="text">
-         <string>Remove layer</string>
         </property>
        </widget>
       </item>
@@ -200,58 +217,48 @@
         </item>
        </layout>
       </item>
+     </layout>
+    </item>
+    <item row="0" column="3" rowspan="2">
+     <layout class="QGridLayout" name="gridLayout_right">
+      <item row="0" column="0">
+       <widget class="QListWidget" name="listWidget_output"/>
+      </item>
       <item row="1" column="0">
-       <layout class="QGridLayout" name="gridLayout_project_setup">
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_area"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_crs">
-          <property name="text">
-           <string>EPSG:2154</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Area</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_crs">
-          <property name="text">
-           <string>CRS</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QCheckBox" name="checkBox_gen_2d">
+        <property name="text">
+         <string>Generate 2D maps</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="checkBox_gen_3d">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Generate 3D obj</string>
+        </property>
+       </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QListWidget" name="listWidget_input"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_project">
+       <widget class="QPushButton" name="pushButton_gen">
         <property name="text">
-         <string>Project</string>
+         <string>Generate</string>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="pushButton_exp">
+        <property name="text">
+         <string>Export</string>
         </property>
        </widget>
       </item>
      </layout>
-    </item>
-    <item row="1" column="1" colspan="2">
-     <widget class="QtInteractor" name="view_3d" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
     </item>
     <item row="0" column="1">
      <widget class="QLabel" name="graphicsView_2d_input">
@@ -279,6 +286,16 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" colspan="2">
+     <widget class="QtInteractor" name="view_3d" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>2</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
       </property>
      </widget>
     </item>
@@ -406,13 +423,16 @@
  </customwidgets>
  <tabstops>
   <tabstop>lineEdit_crs</tabstop>
-  <tabstop>lineEdit_area</tabstop>
+  <tabstop>comboBox_heightmap</tabstop>
+  <tabstop>spinBox_block_size</tabstop>
   <tabstop>listWidget_input</tabstop>
   <tabstop>pushButton_remove_layer</tabstop>
   <tabstop>spinBox_z_factor</tabstop>
   <tabstop>spinBox_elevation_smoothing</tabstop>
   <tabstop>spinBox_dilation</tabstop>
   <tabstop>spinBox_flattening</tabstop>
+  <tabstop>spinBox_elevation_diff</tabstop>
+  <tabstop>listWidget_log</tabstop>
   <tabstop>listWidget_output</tabstop>
   <tabstop>checkBox_gen_2d</tabstop>
   <tabstop>checkBox_gen_3d</tabstop>
@@ -475,7 +495,7 @@
    <sender>listWidget_input</sender>
    <signal>currentRowChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>event_listwidget_input_currentrowchanged(int)</slot>
+   <slot>event_listwidget_input_current_row_changed(int)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>214</x>
@@ -484,6 +504,134 @@
     <hint type="destinationlabel">
      <x>267</x>
      <y>342</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget_input</sender>
+   <signal>doubleClicked(QModelIndex)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_listwidget_input_double_clicked(QModelIndex)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>240</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>lineEdit_crs</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_lineedit_crs_textchanged(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>168</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>39</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget_output</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_listwidget_output_current_row_changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1046</x>
+     <y>322</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1010</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_z_factor</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinbox_z_factor(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>264</x>
+     <y>498</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>561</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_elevation_smoothing</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinbox_elevation_smoothing(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>264</x>
+     <y>524</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>266</x>
+     <y>596</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_dilation</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinbox_dilation(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>264</x>
+     <y>550</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>624</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_flattening</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinbox_flattening(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>264</x>
+     <y>576</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>653</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinBox_elevation_diff</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_spinbox_elevation_diff(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>264</x>
+     <y>602</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -548,134 +696,6 @@
     <hint type="destinationlabel">
      <x>639</x>
      <y>359</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>listWidget_input</sender>
-   <signal>doubleClicked(QModelIndex)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>224</x>
-     <y>240</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>271</x>
-     <y>246</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>lineEdit_crs</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_lineedit_crs_textchanged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>168</x>
-     <y>70</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>270</x>
-     <y>39</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>listWidget_output</sender>
-   <signal>currentRowChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_listwidget_output_currentrowchanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1046</x>
-     <y>322</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1010</x>
-     <y>316</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_z_factor</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_spinBox_z_factor(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>264</x>
-     <y>498</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>271</x>
-     <y>561</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_elevation_smoothing</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_spinBox_elevation_smoothing(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>264</x>
-     <y>524</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>266</x>
-     <y>596</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_dilation</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_spinBox_dilation(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>264</x>
-     <y>550</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>269</x>
-     <y>624</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_flattening</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_spinBox_flattening(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>264</x>
-     <y>576</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>268</x>
-     <y>653</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_elevation_diff</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>event_spinBox_elevation_diff(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>264</x>
-     <y>602</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>270</x>
-     <y>682</y>
     </hint>
    </hints>
   </connection>
@@ -747,7 +767,7 @@
    <sender>actionReset_3D_camera</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>event_reset_3d_camera()</slot>
+   <slot>event_action_reset_3d_camera()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -761,23 +781,22 @@
   </connection>
  </connections>
  <slots>
+  <slot>event_listwidget_input_current_row_changed(int)</slot>
+  <slot>event_listwidget_input_double_clicked(QModelIndex)</slot>
+  <slot>event_listwidget_output_current_row_changed(int)</slot>
+  <slot>event_lineedit_crs_textchanged(QString)</slot>
+  <slot>event_spinbox_z_factor(int)</slot>
+  <slot>event_spinbox_elevation_smoothing(int)</slot>
+  <slot>event_spinbox_dilation(int)</slot>
+  <slot>event_spinbox_flattening(int)</slot>
+  <slot>event_spinbox_elevation_diff(int)</slot>
   <slot>event_pushbutton_remove_layer_clicked()</slot>
   <slot>event_pushbutton_gen_clicked()</slot>
   <slot>event_pushbutton_exp_clicked()</slot>
-  <slot>event_listwidget_input_currentrowchanged(int)</slot>
   <slot>event_action_new()</slot>
   <slot>event_action_open()</slot>
   <slot>event_action_save()</slot>
   <slot>event_action_add()</slot>
-  <slot>event_comboBox_1_activated(int)</slot>
-  <slot>event_listwidget_input_doubleclicked(QModelIndex)</slot>
-  <slot>event_lineedit_crs_textchanged(QString)</slot>
-  <slot>event_listwidget_output_currentrowchanged(int)</slot>
-  <slot>event_spinBox_z_factor(int)</slot>
-  <slot>event_spinBox_elevation_smoothing(int)</slot>
-  <slot>event_spinBox_dilation(int)</slot>
-  <slot>event_spinBox_flattening(int)</slot>
-  <slot>event_spinBox_elevation_diff(int)</slot>
-  <slot>event_reset_3d_camera()</slot>
+  <slot>event_action_reset_3d_camera()</slot>
  </slots>
 </ui>
