@@ -30,19 +30,39 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.current_scene = scene.Scene()
         logger.default.add_callback((self.listWidget_log.addItem, ''))
 
-    def add_layer(self, filename, type, layer_option=None):
+    def add_layer(self, filename, layer_type, layer_option=None):
         self.lineEdit_crs.setEnabled(False)
-        self.current_scene.add_layer(filename, type, layer_option)
+        self.current_scene.add_layer(filename, layer_type, layer_option)
 
-        item = QListWidgetItem(f'{scene.layer_symbols[type]} {os.path.basename(filename)}', self.listWidget_input)
+        item_txt = f'{scene.layer_symbols[layer_type]} {os.path.basename(filename)}'
+        item = QListWidgetItem(item_txt, self.listWidget_input)
         self.listWidget_input.addItem(item)
+
+        if layer_type == scene.LayerType.HEIGHTMAP:
+            self.update_combobox_heightmap()
 
     def remove_layer(self, i):
         if i < 0:
             return
 
+        layer_type = self.current_scene.get_layer_type(i)
         self.listWidget_input.takeItem(i)
         self.current_scene.remove_layer(i)
+
+        if layer_type == scene.LayerType.HEIGHTMAP:
+            self.update_combobox_heightmap()
+
+    def update_combobox_heightmap(self):
+        saved_index = self.comboBox_heightmap.currentIndex()
+        self.comboBox_heightmap.clear()
+
+        heightmap_layers = self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])
+        for layer in heightmap_layers:
+            filename = self.current_scene.get_layer_filename(layer)
+            item_txt = f'{scene.layer_symbols[scene.LayerType.HEIGHTMAP]} {os.path.basename(filename)}'
+            self.comboBox_heightmap.addItem(item_txt)
+
+        self.comboBox_heightmap.setCurrentIndex(saved_index)
 
     def add_layer_dialog(self, filename):
         dlg = DialogImport()
@@ -50,46 +70,44 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         if dlg.exec():
             self.add_layer(dlg.result['filename'], dlg.result['type'])
 
-    def update_view_2d(self, view):
+    @staticmethod
+    def update_view_2d(view, widget):
         if view is None:
-            self.graphicsView_2d_input.clear()
+            widget.clear()
             return
 
         pixmap = qpixmap_from_grayscale_array(view)
-        pixmap = pixmap.scaled(self.graphicsView_2d_input.geometry().width() - 25,
-                               self.graphicsView_2d_input.geometry().height() - 25,
+        pixmap = pixmap.scaled(widget.geometry().width() - 25,
+                               widget.geometry().height() - 25,
                                QtCore.Qt.KeepAspectRatio)
-        self.graphicsView_2d_input.setPixmap(pixmap)
+        widget.setPixmap(pixmap)
+
+    def update_view_2d_input(self, view):
+        self.update_view_2d(view, self.graphicsView_2d_input)
 
     def update_view_2d_output(self, view):
-        if view is None:
-            self.graphicsView_2d_output.clear()
-            return
-
-        pixmap = qpixmap_from_grayscale_array(view)
-        pixmap = pixmap.scaled(self.graphicsView_2d_output.geometry().width() - 25,
-                               self.graphicsView_2d_output.geometry().height() - 25,
-                               QtCore.Qt.KeepAspectRatio)
-        self.graphicsView_2d_output.setPixmap(pixmap)
+        self.update_view_2d(view, self.graphicsView_2d_output)
 
     def event_pushbutton_remove_layer_clicked(self):
         self.remove_layer(self.listWidget_input.currentRow())
 
     def event_pushbutton_gen_clicked(self):
         self.listWidget_output.clear()
-        area = self.lineEdit_area.text()
-        # todo: this is not safe
-        area = eval(area)
 
-        if type(area) != tuple or len(area) != 2 or len(area[0]) != 4 or len(area[1]) != 2:
+        hmap_id = self.comboBox_heightmap.currentIndex()
+        if hmap_id < 0:
             QMessageBox.critical(self,
-                                 "Invalid area",
-                                 f"{area} is not a valid area")
+                                 "No selected heightmap",
+                                 f"No selected heightmap")
+            return
         else:
             if not self.checkBox_gen_2d.isChecked():
                 return
+            # todo: self.spinBox_block_size
+            hmap_layers = self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])
+            hmap = hmap_layers[hmap_id]
 
-            bounds, size = area
+            bounds, size = self.current_scene.get_layer_info(hmap)
             gen = self.current_scene.build(bounds, size, generator=True)
             for info in gen:
                 duration, data_name = info
@@ -131,7 +149,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                                      "Not a folder",
                                      f"{foldername} is not a valid folder")
 
-    def event_listwidget_input_currentrowchanged(self, i):
+    def event_listwidget_input_current_row_changed(self, i):
         self.label_type.setText('')
         self.spinBox_z_factor.setEnabled(False)
         self.spinBox_elevation_smoothing.setEnabled(False)
@@ -142,7 +160,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         if i < 0:
             return
         self.statusbar.showMessage(self.current_scene.get_layer_filename(i))
-        self.update_view_2d(self.current_scene.get_layer_view(i))
+        self.update_view_2d_input(self.current_scene.get_layer_view(i))
         j = self.current_scene.get_layer_type(i)
         self.label_type.setText(f'{scene.layer_symbols[j]} {scene.layer_names[j]}')
         # layer properties
@@ -177,28 +195,29 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             return
         self.current_scene.set_layer_option(layer, option_id, option_val)
 
-    def event_spinBox_z_factor(self, j):
+    def event_spinbox_z_factor(self, j):
         self.event_set_option(0, j)
 
-    def event_spinBox_elevation_smoothing(self, j):
+    def event_spinbox_elevation_smoothing(self, j):
         self.event_set_option(1, j)
 
-    def event_spinBox_dilation(self, j):
+    def event_spinbox_dilation(self, j):
         self.event_set_option(2, j)
 
-    def event_spinBox_flattening(self, j):
+    def event_spinbox_flattening(self, j):
         self.event_set_option(3, j)
 
-    def event_spinBox_elevation_diff(self, j):
+    def event_spinbox_elevation_diff(self, j):
         self.event_set_option(4, j)
 
-    def event_listwidget_input_doubleclicked(self, modelindex):
+    def event_listwidget_input_double_clicked(self, modelindex):
         i = self.listWidget_input.currentRow()
         layer_type = self.current_scene.get_layer_type(i)
         if layer_type == scene.LayerType.HEIGHTMAP:
-            self.lineEdit_area.setText(str(self.current_scene.get_layer_info(i)))
+            layers_hmap = self.current_scene.get_layers_by_types([scene.LayerType.HEIGHTMAP])
+            self.comboBox_heightmap.setCurrentIndex(layers_hmap.index(i))
 
-    def event_listwidget_output_currentrowchanged(self, i):
+    def event_listwidget_output_current_row_changed(self, i):
         if i < 0:
             return
         self.update_view_2d_output((self.current_scene.get_build_data(i)[:,:,0]/256).astype(np.uint8))
@@ -210,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         del self.current_scene
         self.current_scene = scene.Scene()
         self.lineEdit_crs.setEnabled(True)
-        self.lineEdit_area.setText('')
+        self.comboBox_heightmap.clear()
         self.label_type.setText('')
         self.listWidget_input.clear()
         self.listWidget_output.clear()
@@ -222,7 +241,6 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
             with open(filename[0], 'r') as outfile:
                 data = json.load(outfile)
 
-            self.lineEdit_area.setText(data['area'])
             self.lineEdit_crs.setText(data['crs'])
             self.lineEdit_crs.setEnabled(False)
             self.current_scene.crs = data['crs']
@@ -233,12 +251,14 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
                 self.add_layer(x['file'], x['type'], layer_option=x['opts'])
                 i += 1
 
+            self.comboBox_heightmap.setCurrentIndex(int(data['hmap']))
+
     def event_action_save(self):
         filename = QFileDialog.getSaveFileName(self, "Open file", None, "(*.json)")
         if len(filename[0]) > 0:
             data = dict()
             data['crs'] = self.current_scene.crs
-            data['area'] = self.lineEdit_area.text()
+            data['hmap'] = self.comboBox_heightmap.currentIndex()
 
             for i in range(len(self.current_scene.layers)):
                 data[i] = {'file': self.current_scene.get_layer_filename(i),
@@ -251,7 +271,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_action_add(self):
         self.add_layer_dialog("")
 
-    def event_reset_3d_camera(self):
+    def event_action_reset_3d_camera(self):
         self.view_3d.reset_camera()
 
     def dragEnterEvent(self, event):
