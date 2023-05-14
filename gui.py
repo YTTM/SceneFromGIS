@@ -87,7 +87,14 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
         self.update_view_2d(view, self.graphicsView_2d_input)
 
     def update_view_2d_output(self, view):
-        self.update_view_2d(view, self.graphicsView_2d_output)
+        divider = int(max(1, self.verticalSlider_2d_output_exposure.value()))
+        self.update_view_2d((view / divider).astype(np.uint8), self.graphicsView_2d_output)
+
+    def event_slider_2d_output_exposure_value_changed(self, j):
+        i = self.listWidget_output.currentRow()
+        if i < 0:
+            return
+        self.update_view_2d_output(self.current_scene.get_build_data(i)[:, :, 0])
 
     def event_pushbutton_remove_layer_clicked(self):
         self.remove_layer(self.listWidget_input.currentRow())
@@ -222,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def event_listwidget_output_current_row_changed(self, i):
         if i < 0:
             return
-        self.update_view_2d_output((self.current_scene.get_build_data(i)[:,:,0]/256).astype(np.uint8))
+        self.update_view_2d_output(self.current_scene.get_build_data(i)[:, :, 0])
 
     def event_lineedit_crs_textchanged(self, crs):
         self.current_scene.crs = str(crs)

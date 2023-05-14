@@ -15,6 +15,51 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="1" colspan="3">
+     <widget class="QtInteractor" name="view_3d" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>2</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QSlider" name="verticalSlider_2d_output_exposure">
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>256</number>
+      </property>
+      <property name="value">
+       <number>256</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="invertedAppearance">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="graphicsView_2d_output">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>2</horstretch>
+        <verstretch>3</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="0" rowspan="2">
      <layout class="QGridLayout" name="gridLayout_left">
       <item row="0" column="0">
@@ -219,7 +264,7 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="3" rowspan="2">
+    <item row="0" column="4" rowspan="2">
      <layout class="QGridLayout" name="gridLayout_right">
       <item row="0" column="0">
        <widget class="QListWidget" name="listWidget_output"/>
@@ -273,33 +318,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="2">
-     <widget class="QLabel" name="graphicsView_2d_output">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>2</horstretch>
-        <verstretch>3</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1" colspan="2">
-     <widget class="QtInteractor" name="view_3d" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>2</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="4">
+    <item row="2" column="0" colspan="5">
      <widget class="QListWidget" name="listWidget_log">
       <property name="maximumSize">
        <size>
@@ -779,6 +798,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>verticalSlider_2d_output_exposure</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>event_slider_2d_output_exposure_value_changed(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1002</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1011</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>event_listwidget_input_current_row_changed(int)</slot>
@@ -798,5 +833,6 @@
   <slot>event_action_save()</slot>
   <slot>event_action_add()</slot>
   <slot>event_action_reset_3d_camera()</slot>
+  <slot>event_slider_2d_output_exposure_value_changed(int)</slot>
  </slots>
 </ui>
