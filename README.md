@@ -31,9 +31,70 @@ The launch of the binary `SceneFromGIS.exe [...]` will be replaced by `python ma
 
 
 #### Command Line Interface
-todo, see [Todo / Not implemented yet](#todo--not-implemented-yet) section.
+**Minimal usage**
+```
+> SceneFromGIS.exe elevation_map.tif output_folder [optional layers]
+```
 
-`> SceneFromGIS.exe data/alti.tif --building-polygon data/building-polygon.shp`
+**Full details**
+```
+usage: elevation
+       output
+       [--block-size BLOCK_SIZE]
+       [--crs CRS]
+       [--z-factor Z_FACTOR]
+       [--elevation-smoothing ELEVATION_SMOOTHING]
+       [--path-line PATH_LINE [PATH_LINE ...]]
+       [--building-line BUILDING_LINE [BUILDING_LINE ...]]
+       [--building-polygon BUILDING_POLYGON [BUILDING_POLYGON ...]]
+       [--forest-line FOREST_LINE [FOREST_LINE ...]]
+       [--forest-polygon FOREST_POLYGON [FOREST_POLYGON ...]]
+       [--forest-point FOREST_POINT [FOREST_POINT ...]]
+       [--water-line WATER_LINE [WATER_LINE ...]]
+       [--water-polygon WATER_POLYGON [WATER_POLYGON ...]]
+
+positional arguments:
+  elevation
+  output
+
+optional arguments:
+  --z-factor Z_FACTOR
+  --elevation-smoothing ELEVATION_SMOOTHING
+  
+add layer arguments:
+  --block-size BLOCK_SIZE
+  --crs CRS
+  --path-line PATH_LINE [PATH_LINE ...]
+  --building-line BUILDING_LINE [BUILDING_LINE ...]
+  --building-polygon BUILDING_POLYGON [BUILDING_POLYGON ...]
+  --forest-line FOREST_LINE [FOREST_LINE ...]
+  --forest-polygon FOREST_POLYGON [FOREST_POLYGON ...]
+  --forest-point FOREST_POINT [FOREST_POINT ...]
+  --water-line WATER_LINE [WATER_LINE ...]
+  --water-polygon WATER_POLYGON [WATER_POLYGON ...]
+
+add layer optional arguments (line and polython only):
+  *dilation DILATION
+  *flattening FLATTENING
+  *elevation-difference ELEVATION_DIFFERENCE
+usage: filename [*dilation DILATION] [*flattening FLATTENING] [*elevation-difference ELEVATION_DIFFERENCE]
+```
+
+**Some examples**
+```
+> SceneFromGIS.exe
+data/Cardet/ALTI_CLIP_1k5.tif
+output/Cardet
+--path-line data/Cardet/path-line.shp *dilation 3
+--path-line data/Cardet/path-line-important.shp *dilation 5 *flattening 2
+--building-line data/Cardet/building-line.shp *dilation 2 *flattening 3
+--building-polygon data/Cardet/building-polygon.shp *flattening 3
+--forest-line data/Cardet/forest-line.shp
+--forest-polygon data/Cardet/forest-polygon.shp
+--forest-point data/Cardet/forest-point.shp
+--water-line data/Cardet/water-line.shp *dilation 5 *flattening 2 *elevation-difference -5
+--water-polygon data/Cardet/water-polygon.shp *dilation 2 *flattening 3 *elevation-difference -5
+```
 
 
 ### How to use it for video game maps ?
@@ -90,20 +151,17 @@ in console and showed in GUI.
 
 **morphology** module implement auto median morphological filter.
 
+**utils** module implement some simple required function which we decide not to categorize.
+
 
 ### Todo / Not implemented yet
-* CLI
-  * Implement CLI interface
-* Input data
-  * Simplify the system of area / multiple heightmap
-* Generate 2D object
-  * Block size
-* Generate paths as vector data
+* Generate paths as vector data (work in progress)
 * Generate 3D object
   * Terrain as 3D obj
   * Roads as 3D obj
   * Buildings as 3D obj
   * Forest as 3D obj (trees)
+* Good 3D objects fit
 * Export
   * New export format (e.g. adapted to Unity)
 
