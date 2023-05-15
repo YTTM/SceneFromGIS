@@ -217,7 +217,7 @@ class Scene:
         t1 = time.time()
         return data, (f'{round(t1-t0, 2)} s', f'{str(layer_names_[self.get_layer_type(layer)])}_{layer:02} Elevation Smoothing')
 
-    def build(self, heightmap_id, block_size, generator=False):
+    def build(self, heightmap_id, block_size, generator=False, current_logger=logger.default):
         self.outputs = []
         self.outputs_path = []
         tmp_outputs = {}
@@ -233,8 +233,8 @@ class Scene:
         size = (x_blocks * block_size, y_blocks * block_size)
         self.set_layer_info(heightmap_id, (bounds, size))
 
-        logger.default.log(f'{"[scene ][build]":16} {"blocks":16} : {x_blocks} x {y_blocks}')
-        logger.default.log(f'{"[scene ][build]":16} {"output size":16} : {x_blocks * block_size} x {y_blocks * block_size}')
+        current_logger.log(f'{"[scene ][build]":16} {"blocks":16} : {x_blocks} x {y_blocks}')
+        current_logger.log(f'{"[scene ][build]":16} {"output size":16} : {x_blocks * block_size} x {y_blocks * block_size}')
 
         # Map initial build
         for l_type in LayerType:
