@@ -7,7 +7,7 @@ Create scenes for video game maps from real geographic data.
 #### Users
 Download prebuild binaries for Windows x64.  
 Current version : 
-[Alpha 1](https://mega.nz/file/2boFkIoS#UjOyj_9bzGoYU5mm9uPliZqP9tSONVScmpnghK4FtKE)
+[Beta 2](https://mega.nz/file/iTxUXIQB#sZQjnKh52rTiwludeLnHIAf-K33mq5LLK6fDHcjpYLs)
 
 #### Developers
 Create a virtual environment and install [requirements](#Requirements).
