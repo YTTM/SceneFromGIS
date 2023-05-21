@@ -23,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow, mainform.Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
+        self.listWidget_log.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
         self.setWindowIcon(QtGui.QIcon(':/icons/SfGicon.png'))
         self.setAcceptDrops(True)
         self.view_3d.set_background('E0E0E0')
